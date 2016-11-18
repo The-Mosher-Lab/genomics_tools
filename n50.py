@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# Calculate N50 of a genome
+
 import sys
 
 sequence, lengths = [], []
@@ -11,6 +13,6 @@ with open(sys.argv[1]) as genome:
         else:
             sequence += line.strip()
 
-n50 = sorted(lengths)[len(lengths) / 2]
+n50 = sorted(lengths)[int(len(lengths) / 2)]
 
-print "N50 = %s" % n50
+print("N50 = %s" % n50)
