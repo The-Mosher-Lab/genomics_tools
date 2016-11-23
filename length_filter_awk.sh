@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
 
 # Filter .fastq reads between sizes defined by user input.
-# The first option passed is the file to run the script on, second is minimum length, and third is maximum length.
+# The first option is minimum length, and second is maximum length.
+# Run this script in a folder containing all the .fastq.gz files to be filtered.
+# Outputs will go in a subdirectory called "filtered."
 
-zcat "$1" | awk -v min_length="$2" -v max_length="$3" '
-    BEGIN {
-        OFS = "\n"
-    }
-    {
-        header = $0 ; getline seq ; getline qheader ; getline qseq ; if (length(seq) >= min_length && length(seq) <= max_length) {
-            print header, seq, qheader, qseq
-            }
-    }
-' | gzip > "${1%.fastq.gz}.filtered.fastq.gz"
+mkdir -p ./filtered && \
+for fastq_gz_file in ./*fastq.gz
+do
+	zcat "$fastq_gz_file" | awk -v min_length="$1" -v max_length="$2" '
+    	BEGIN {
+    	    OFS = "\n"
+    	}
+    	{
+    	    header = $0 ; getline seq ; getline qheader ; getline qseq ; if (length(seq) >= min_length && length(seq) <= max_length) {
+    	        print header, seq, qheader, qseq
+    	        }
+    	}
+	' | gzip > "./filtered/${fastq_gz_file%.fastq.gz}.filtered.fastq.gz"
+done
