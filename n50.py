@@ -4,6 +4,8 @@
 
 import sys
 
+__author__ = 'groverj3'
+
 sequence, lengths = [], []
 with open(sys.argv[1]) as genome:
     for line in genome:
