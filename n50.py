@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Calculate N50 of a genome
+# Calculate N50 of a genome and output to terminal
 
 import sys
 
