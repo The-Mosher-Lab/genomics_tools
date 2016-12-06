@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-# Calculate N50 of a genome and output to terminal
+# Author: Jeffrey Grover
+# Purpose: Quick calculation of the N50 of a genome and output to terminal
 
 import sys
 
-__author__ = 'groverj3'
 
 sequence, lengths = [], []
 with open(sys.argv[1]) as genome:

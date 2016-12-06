@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-# Filter .fastq reads between sizes defined by user input.
+# Author: Jeffrey Grover
+# Purpose: Filter .fastq reads between sizes defined by user input.
+
 # The first option is minimum length, and second is maximum length.
 # Run this script in a folder containing all the .fastq.gz files to be filtered.
 # Outputs will go in a subdirectory called "filtered."

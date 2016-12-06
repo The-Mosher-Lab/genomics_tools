@@ -1,6 +1,7 @@
 #!/usr/bin/env Rscript
 
-# R script to create small RNA size distribution line plots from input files with two columns (counts), (length)
+# Author: Jeffrey Grover
+# Purpose: Create small RNA size distribution line plots from input files with two columns (counts), (length)
 # Run on BASH command line, use 'find . -name "(p)" -exec "./size_profiles.R" {} \;' to batch process
 
 library(ggplot2)
