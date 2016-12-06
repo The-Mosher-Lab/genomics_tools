@@ -17,11 +17,11 @@ ggplot(data = readlengths, aes(x = V2, y = `21-normalized`)) +
   theme(plot.title = element_text(size = 30)) + # Change axis titles
   ylab("Normalized Reads") + # \n adds a new line, increases distance between label and axis
   xlab("Length (nt)") +
-  scale_x_continuous(breaks = c(19:27),labels = c("19", "20", "21", "22", "23", "24", "25", "26", "27")) +
+  scale_x_continuous(breaks = 19:27, labels = 19:27) +
   theme(axis.text = element_text(size = 22)) + # Changes axis labels
   theme(axis.title = element_text(size = 25)) + # Change axis titles
-  theme(axis.title.y = element_text(margin = margin(0,15,0,0))) + # Changes label distance to axis 
-  theme(axis.title.x = element_text(margin = margin(15,0,0,0)))
+  theme(axis.title.y = element_text(margin = margin(0, 15, 0, 0))) + # Changes label distance to axis 
+  theme(axis.title.x = element_text(margin = margin(15, 0, 0, 0)))
 
 # Saves output to .png based on input filename without .txt extension
 
