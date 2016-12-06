@@ -25,4 +25,4 @@ ggplot(data = readlengths, aes(x = V2, y = V1)) +
 
 ggsave(filename = paste(sub("\\.txt$", "", input_file), ".png", sep = ""), width = 7.5, height = 5) 
 
-if(file.exists("Rplots.pdf")) file.remove("Rplots.pdf") # Removes unneeded Rplots.pdf that I can't suppress
+if(file.exists("Rplots.pdf")) file.remove("Rplots.pdf") # Removes unneeded Rplots.pdf that I can't suppress for some reason
