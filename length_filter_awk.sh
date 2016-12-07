@@ -6,7 +6,7 @@
 
 # The first option is minimum length, and second is maximum length.
 # Run this script in a folder containing all the .fastq.gz files to be filtered.
-# Outputs will go in a subdirectory called "filtered."
+# Outputs will go in a subdirectory called "filtered_$1-$2"
 
 mkdir -p "./filtered_$1-$2" && \
 for fastq_gz_file in ./*fastq.gz
