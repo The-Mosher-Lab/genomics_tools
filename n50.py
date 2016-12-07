@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # Author: Jeffrey Grover
+# Created: 11/2016
 # Purpose: Quick calculation of the N50 of a genome and output to terminal
 
 import sys
