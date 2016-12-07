@@ -4,7 +4,7 @@
 # Created: 12/2016
 # Purpose: Create small RNA size distribution line plots from input files with two columns (counts), (length)
 
-# Run on BASH command line, use 'find . -name "(p)" -exec "./size_profiles.R" {} \;' to batch process
+# Run on BASH command line, use 'find . -name "(p)" -exec "./sRNA_size_profiles.R" {} \;' to batch process
 
 library(ggplot2)
 
