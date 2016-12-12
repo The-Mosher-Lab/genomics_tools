@@ -6,12 +6,13 @@
 
 # The first option is an input fastq file, --min and --max are min and max length to filter
 # The output file will be another fastq with the length filtering appended to the filename
+# Use find -exec to batch process: ex. 'find . -name "*.fastq" -exec "./fastq_length_filter.py" {} --min 25 --max 27 \;'
 
 import re
 from argparse import ArgumentParser
 
 
-# Define function
+# Define function to iterate over fastq reads and output reads to new file if between min and max length
 
 
 def filter_by_length(inpath, outpath, min_length, max_length):
