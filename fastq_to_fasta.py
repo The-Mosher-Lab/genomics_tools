@@ -14,7 +14,7 @@ from argparse import ArgumentParser
 # Define function to iterate over fastq reads and output reads to new file in fasta format
 
 
-def fq_to_fa (input_path, output_path):
+def fq_to_fa(input_path, output_path):
     n = 0
     fq_record = []
     output_file = open(output_path, 'w')
