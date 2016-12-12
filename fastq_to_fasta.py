@@ -5,6 +5,7 @@
 # Created: 12/2016
 
 # Extracts reads from a .fastq file and creates a multifasta file from them
+# Use find -exec to batch process: ex. 'find . -name "*.fastq" -exec "./fastq_to_fasta.py" {} \;'
 
 import re
 from argparse import ArgumentParser
