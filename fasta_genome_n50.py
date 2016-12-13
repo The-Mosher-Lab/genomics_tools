@@ -4,6 +4,8 @@
 # Created: 11/2016
 # Purpose: Quick calculation of the N50 of a genome and output to terminal
 
+# Run by supplying a genome .fasta as a positional argument
+
 import sys
 
 
@@ -18,4 +20,4 @@ with open(sys.argv[1]) as genome:
 
 n50 = sorted(lengths)[int(len(lengths) / 2)]
 
-print("N50 = %s" % n50)
+print(n50)
