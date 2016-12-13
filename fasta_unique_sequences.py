@@ -14,7 +14,7 @@ from itertools import groupby
 # Define the function to check for unique sequences
 
 
-def unique_seq_output (input_path, output_path):
+def unique_seq(input_path, output_path):
     ishead = lambda x: x.startswith('>')  # fasta records all start with > in the header
     all_seqs = set()
     with open(input_path, 'r') as input_handle:
@@ -41,4 +41,4 @@ output_fasta = re.sub(r'\.fasta$', '.unique.fasta', input_fasta)
 
 # Parse the input.fasta and output unique sequences
 
-unique_seq_output(input_fasta, output_fasta)
+unique_seq(input_fasta, output_fasta)
