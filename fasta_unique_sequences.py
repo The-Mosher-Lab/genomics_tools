@@ -33,7 +33,6 @@ def unique_seq(input_path, output_path):
 
 parser = ArgumentParser(
     description='Reads a .fasta file and outputs another .fasta with only unique sequences from the input file')
-
 parser.add_argument('input_path', help='Input .fasta file', metavar='File')
 
 input_fasta = parser.parse_args().input_path
