@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Author: Jeffrey Grover
-# Purpose: Filter shortstack "Rounts.txt" output for loci of a defined size
+# Purpose: Filter shortstack "Results.txt" output for loci of a defined size
 # Created: 6/2017
 
 # Filters shortstack results.txt loci of a size defined by user input
@@ -27,7 +27,7 @@ def filter_by_dicercall(input_results, input_dicercall, output_results):
 
 # Parse command line options
 
-parser = ArgumentParser(description='Filter shortstack "Rounts.txt" output for loci of a defined size. Requires '
+parser = ArgumentParser(description='Filter shortstack "Results.txt" output for loci of a defined size. Requires '
                                     'Results.txt from a shortstack run in the same folder.')
 parser.add_argument('--size', help='Size class of loci to retrieve', type=int)
 
