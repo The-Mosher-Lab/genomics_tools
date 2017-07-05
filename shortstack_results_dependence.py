@@ -21,7 +21,7 @@ def dependence_test(input_file, significance):
     nrpd_rdr2_dependent = 0
     nrpe_rdr2_dependent = 0
     nrpd_nrpe_rdr2_dependent = 0
-    significance_threshold = significance/100
+    significance_threshold = 1 - (significance/100)
     with open(input_file, 'r') as input_handle:
         input_csv = csv.reader(input_handle, delimiter=',')
         next(input_csv)
