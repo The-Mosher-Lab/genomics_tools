@@ -5,7 +5,7 @@
 # Created: 7/2017
 
 # This script will load in a .csv file containing small RNA loci expression where the first four columns are Locus,
-# Name, Length, and WT. It accepts two command line arguments which is the column of the sequencing library to test
+# Name, Length, and WT. It accepts two command line arguments which are the column of the sequencing library to test
 # vs WT, and the specified expression threshold.
 
 # The script will output the results to stdout
