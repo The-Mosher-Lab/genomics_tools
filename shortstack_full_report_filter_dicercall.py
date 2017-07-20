@@ -18,7 +18,7 @@ def filter_by_dicercall(input_report, input_dicercall, output_results):
             output_csv.writerow(next(input_csv))
             for row in input_csv:
                 dicercall = row[11]
-                if dicercall == 'N':
+                if dicercall == 'N' or dicercall == 'NA':
                     dicercall = 0   # Kind of hacky, but next(dicercall) led to skipping lines after an 'N'
                 if int(dicercall) == input_dicercall:
                     output_csv.writerow(row)
