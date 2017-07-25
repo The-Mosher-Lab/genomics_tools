@@ -29,10 +29,11 @@ parser = ArgumentParser(description='Filter the combined "shortstack_full_report
                                     'size. This must be run in the same folder as a file titled '
                                     '"shortstack_full_report.csv."')
 parser.add_argument('--size', help='Size class of loci to retrieve', type=int)
+parser.add_argument('input_path', help='Input file', metavar='File')
 
 size_class = parser.parse_args().size
 output_path = 'shortstack_full_report_%snt.csv' % size_class
-input_path = './shortstack_full_report.csv'
+input_path = parser.parse_args().input_path
 
 # Filter the data
 
