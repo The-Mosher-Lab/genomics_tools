@@ -10,16 +10,14 @@ from argparse import ArgumentParser
 # Define function to filter output loci for expression above a threshold in one sample
 
 
-def filter_by_expression(input_report, threshold, column, output_results):
+def filter_by_expression(input_report, threshold, column):
     with open(input_report, 'r') as input_handle:
         input_csv = csv.reader(input_handle)
-        with open(output_results, 'w') as output_handle:
-            output_csv = csv.writer(output_handle)
-            output_csv.writerow(next(input_csv))
-            for row in input_csv:
-                sample = int(row[column])
-                if sample >= threshold:
-                    output_csv.writerow(row)
+        print(', '.join(next(input_csv)))
+        for row in input_csv:
+            sample = int(row[column])
+            if sample >= threshold:
+                print(', '.join(row))
 
 # Parse command line options
 
@@ -33,8 +31,7 @@ parser.add_argument('input_path', help='File to process', metavar='File')
 library = parser.parse_args().column - 1  # Because humans count starting at 1 not 0
 expression = parser.parse_args().threshold
 input_path = parser.parse_args().input_path
-output_path = 'shortstack_full_report_col%s_exp%s.csv' % (library + 1, expression)
 
 # Process the file
 
-filter_by_expression(input_path, expression, library, output_path)
+filter_by_expression(input_path, expression, library)
