@@ -11,7 +11,7 @@
 from argparse import ArgumentParser
 
 
-def bed_to_gtf(input_file, source):
+def bed_to_gtf(input_file, anno_source):
     with open(input_file, 'r') as input_handle:
         for line in input_handle:
             entry = line.split()
@@ -21,9 +21,9 @@ def bed_to_gtf(input_file, source):
             name_family = entry[3]
             te_type = entry[4]  # Original .bed file had TE type in this position
             strand = entry[5]
-            print(chrom, source, 'transposable_element', start, stop, '.', strand, '.',
-                  'gene_id "%s"; gene_name "%s"; transposable_element_family_ID "%s"; transposable_element_type "%s";' %
-                  (name_family, name_family, name_family, te_type), sep='\t')
+            print(chrom, anno_source, 'transposable_element', start, stop, '.', strand, '.',
+                  'gene_id "%s"; gene_name "%s"; transposable_element_family_ID "%s"; transposable_element_type "%s";'
+                  % (name_family, name_family, name_family, te_type), sep='\t')
 
 
 # Parse command line options
