@@ -48,27 +48,31 @@ def parse_shortstack_full_report(input_report):
         return shortstack_dict
 
 
-def overlap_shortstack_gff3(gff_dict, shortstack_dict, output_file, upstream_bp):
+def overlap_shortstack_gff3(gff_dict, shortstack_dict, output_file, upstream_bp, feature_body, downstream_bp):
     with open(output_file, 'w') as output_handle:
         output_file = csv.writer(output_handle)
         line_separator = '#'
         for chromosome in gff_dict:
             if chromosome in shortstack_dict:
-                for gene in gff_dict[chromosome]:
-                    gene_id = gene
-                    gene_start = gff_dict[chromosome][gene][1]
-                    gene_stop = gff_dict[chromosome][gene][2]
-                    gene_strand = gff_dict[chromosome][gene][3]
-                    gene_row = [chromosome, gene_id, gene_start, gene_stop, gene_strand]
+                for feature in gff_dict[chromosome]:
+                    feature_id = feature
+                    feature_start = gff_dict[chromosome][feature][1]
+                    feature_stop = gff_dict[chromosome][feature][2]
+                    feature_strand = gff_dict[chromosome][feature][3]
+                    feature_row = [chromosome, feature_id, feature_start, feature_stop, feature_strand]
                     output_file.writerow(line_separator)
-                    output_file.writerow(gene_row)
+                    output_file.writerow(feature_row)
                     for cluster in shortstack_dict[chromosome]:
                         cluster_name = cluster
                         cluster_start = shortstack_dict[chromosome][cluster][0]
                         cluster_stop = shortstack_dict[chromosome][cluster][1]
                         cluster_info = shortstack_dict[chromosome][cluster][2]
-                        if cluster_start >= gene_start - upstream_bp:
-                            cluster_row = [chromosome, cluster_name, cluster_start, cluster_stop] + list((i for i in cluster_info))
+                        cluster_row = [chromosome, cluster_name, cluster_start, cluster_stop] + list((i for i in cluster_info))
+                        if upstream_bp > 0 and cluster_start >= feature_start - upstream_bp and cluster_start <= feature_start:
+                            output_file.writerow(cluster_row)
+                        if feature_body and cluster_start >= feature_start and cluster_start <= feature_stop:
+                            output_file.writerow(cluster_row)
+                        if downstream_bp > 0 and cluster_start <= feature_stop + downstream_bp and cluster_start >= feature_stop:
                             output_file.writerow(cluster_row)
 
 
@@ -78,16 +82,18 @@ parser = ArgumentParser(description='Looks for overlap between features of inter
 parser.add_argument('--gff', help='Input gff3 file', metavar='File')
 parser.add_argument('--ssreport', help='Input ShortStack Report', metavar='File')
 parser.add_argument('--feature', help='Feature to look for overlap with from gff3 file', type=str)
-parser.add_argument('--upstream', help='Distance upstream to look for overlap', type=int)
-#parser.add_argument('--downstream', help='Distance downstream from gene to look for overlap', type=int)
-#parser.add_argument('--body', help='Also look for overlap over the body of the feature')
+parser.add_argument('--upstream', help='Distance upstream to look for overlap', type=int, default=0)
+parser.add_argument('--downstream', help='Distance downstream from gene to look for overlap', type=int, default=0)
+parser.add_argument('--body', help='Also look for overlap over the body of the feature', action='store_true')
 
 gff = parser.parse_args().gff
 ssreport = parser.parse_args().ssreport
 gff_feature = parser.parse_args().feature
 upstream = parser.parse_args().upstream
+body = parser.parse_args().body
+downstream = parser.parse_args().downstream
 overlap_file = 'overlap.txt'
 
-# Run the functions
+# Run the functions to get the overlap
 
-overlap_shortstack_gff3(parse_gff(gff, gff_feature), parse_shortstack_full_report(ssreport), overlap_file, upstream)
+overlap_shortstack_gff3(parse_gff(gff, gff_feature), parse_shortstack_full_report(ssreport), overlap_file, upstream, body, downstream)
