@@ -20,11 +20,13 @@ def parse_gff(input_gff, gff_feature):
                 feature = row[2]
                 start = int(row[3])
                 stop = int(row[4])
-                strand = row[5]
+                strand = row[6]
                 feature_id = str(row[8].split(';')[0])[3:]
                 if chromosome not in gff_dict:
                     gff_dict[chromosome] = {}
-                gff_dict[chromosome] = [feature_id, feature, start, stop, strand]
+                if feature_id not in gff_dict[chromosome]:
+                    gff_dict[chromosome][feature_id] = {}
+                gff_dict[chromosome][feature_id] = [feature, start, stop, strand]
         return gff_dict
 
 
@@ -37,31 +39,37 @@ def parse_shortstack_full_report(input_report):
             start = int(row[0].split(':')[1].split('-')[0])
             stop = int(row[0].split(':')[1].split('-')[1])
             cluster_name = row[1]
-            to_row_end = row[2:]
+            shortstack_info = row[2:]
             if chromosome not in shortstack_dict:
                 shortstack_dict[chromosome] = {}
-            shortstack_dict[chromosome] = [cluster_name, start, stop, to_row_end]
+            if cluster_name not in shortstack_dict[chromosome]:
+                shortstack_dict[chromosome][cluster_name] = {}
+            shortstack_dict[chromosome][cluster_name] = [start, stop, shortstack_info]
         return shortstack_dict
 
 
 def overlap_shortstack_gff3(gff_dict, shortstack_dict, output_file, upstream_bp):
-    with open(output_file, 'a') as output_handle:
+    with open(output_file, 'w') as output_handle:
+        output_file = csv.writer(output_handle)
+        line_separator = '#'
         for chromosome in gff_dict:
             if chromosome in shortstack_dict:
                 for gene in gff_dict[chromosome]:
-                    gene_id = gene[0]
-                    feature = gene[1]
-                    gene_start = gene[2]
-                    gene_stop = gene[3]
-                    gene_strand = gene[4]
-                    output_handle.write(','.join('###', chromosome, gene_id, feature, gene_start, gene_stop, gene_strand))
+                    gene_id = gene
+                    gene_start = gff_dict[chromosome][gene][1]
+                    gene_stop = gff_dict[chromosome][gene][2]
+                    gene_strand = gff_dict[chromosome][gene][3]
+                    gene_row = [chromosome, gene_id, gene_start, gene_stop, gene_strand]
+                    output_file.writerow(line_separator)
+                    output_file.writerow(gene_row)
                     for cluster in shortstack_dict[chromosome]:
-                        cluster_name = cluster[0]
-                        cluster_start = cluster[1]
-                        cluster_stop = cluster[2]
-                        cluster_info = cluster[3]
+                        cluster_name = cluster
+                        cluster_start = shortstack_dict[chromosome][cluster][0]
+                        cluster_stop = shortstack_dict[chromosome][cluster][1]
+                        cluster_info = shortstack_dict[chromosome][cluster][2]
                         if cluster_start >= gene_start - upstream_bp:
-                            output_handle.write(','.join(chromosome, cluster_start, cluster_stop, cluster_name, cluster_info))
+                            cluster_row = [chromosome, cluster_name, cluster_start, cluster_stop] + list((i for i in cluster_info))
+                            output_file.writerow(cluster_row)
 
 
 # Parse command line options
@@ -82,4 +90,4 @@ overlap_file = 'overlap.txt'
 
 # Run the functions
 
-overlap_shortstack_gff(parse_gff(gff, gff_feature), parse_shortstack_full_report(ssreport), overlap_file, upstream)
+overlap_shortstack_gff3(parse_gff(gff, gff_feature), parse_shortstack_full_report(ssreport), overlap_file, upstream)
