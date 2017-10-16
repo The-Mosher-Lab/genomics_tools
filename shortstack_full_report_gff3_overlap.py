@@ -21,7 +21,7 @@ def parse_gff(input_gff, gff_feature):
                 start = int(row[3])
                 stop = int(row[4])
                 strand = row[5]
-                feature_id = str(row[8].split(';')[0])[3:]  # Store ID without ID=Bra as an integer
+                feature_id = str(row[8].split(';')[0])[3:]
                 if chromosome not in gff_dict:
                     gff_dict[chromosome] = {}
                 gff_dict[chromosome] = [feature_id, feature, start, stop, strand]
