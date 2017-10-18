@@ -7,4 +7,4 @@
 # Accepts two filenames as input. File 1 will be Results.txt, File 2 is Counts.txt
 # Outputs to a new file called "shortstack_full_report.csv"
 
-join --header "$1" "$2" | cut -d ' ' --complement -f22,23 | tr ' ' ',' > shortstack_full_report.csv
+join --header "$1" "$2" | cut -d ' ' --complement -f22,23 | tr '' ',' > shortstack_full_report.csv
