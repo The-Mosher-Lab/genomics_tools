@@ -13,11 +13,11 @@ from argparse import ArgumentParser
 def filter_by_expression(input_report, threshold, column):
     with open(input_report, 'r') as input_handle:
         input_csv = csv.reader(input_handle)
-        print(', '.join(next(input_csv)))
+        print(','.join(next(input_csv)))
         for row in input_csv:
             sample = int(row[column])
             if sample >= threshold:
-                print(', '.join(row))
+                print(','.join(row))
 
 # Parse command line options
 
