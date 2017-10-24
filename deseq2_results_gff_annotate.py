@@ -97,7 +97,7 @@ gff3_dict = parse_gff(gff_file, feature)
 
 output_header = [
     'chromosome', 'feature_id', 'type', 'start', 'stop', 'strand'
-] + deseq2_result[1]
+] + deseq2_result[1][1:]
 
 # Run the function to annotate the file
 
