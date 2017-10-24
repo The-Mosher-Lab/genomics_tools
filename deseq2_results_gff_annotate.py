@@ -40,7 +40,8 @@ def parse_gff(input_gff, gff_feature):
                 start = int(row[3])
                 stop = int(row[4])
                 strand = row[6]
-                feature_id = int(''.join(filter(str.isdigit, str(row[8].split(';')[0])[3:])))
+                feature_id = int(''.join(
+                    filter(str.isdigit, str(row[8].split(';')[0])[3:])))
                 if chromosome not in gff_dict:
                     gff_dict[chromosome] = {}
                 if feature_id not in gff_dict[chromosome]:
