@@ -40,7 +40,7 @@ def parse_gff(input_gff, gff_feature):
                 start = int(row[3])
                 stop = int(row[4])
                 strand = row[6]
-                feature_id = str(row[8].split(';')[0])[3:]
+                feature_id = int(''.join(filter(str.isdigit, str(row[8].split(';')[0])[3:])))
                 if chromosome not in gff_dict:
                     gff_dict[chromosome] = {}
                 if feature_id not in gff_dict[chromosome]:
@@ -56,12 +56,13 @@ def annotate_results(features_dict, gff3_dict, output_file, header):
         output_file = csv.writer(output_handle)
         output_file.writerow(header)
         for feature in features_dict:
+            feature_digits = int(''.join(filter(str.isdigit, feature)))
             for chromosome in gff3_dict:
-                if feature in gff3_dict[chromosome]:
-                    feature_type = gff3_dict[chromosome][feature][0]
-                    start = gff3_dict[chromosome][feature][1]
-                    stop = gff3_dict[chromosome][feature][2]
-                    strand = gff3_dict[chromosome][feature][3]
+                if feature_digits in gff3_dict[chromosome]:
+                    feature_type = gff3_dict[chromosome][feature_digits][0]
+                    start = gff3_dict[chromosome][feature_digits][1]
+                    stop = gff3_dict[chromosome][feature_digits][2]
+                    strand = gff3_dict[chromosome][feature_digits][3]
                     deseq2_info = features_dict[feature][0]
                     output_row = [
                         chromosome, feature, feature_type, start, stop, strand
