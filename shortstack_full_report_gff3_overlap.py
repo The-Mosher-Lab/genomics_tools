@@ -120,7 +120,7 @@ body = parser.parse_args().body
 downstream = parser.parse_args().downstream
 overlap_file = ssreport.rsplit('.', 1)[0] + (
     '_overlap_' + gff_feature + '_' + str(upstream) + '_up_' +
-    str(downstream) + '_down_' + str(body).lower() + '_body.txt')
+    str(downstream) + '_down_' + str(body).lower() + '_body.csv')
 
 # Run the functions to get the overlap
 
