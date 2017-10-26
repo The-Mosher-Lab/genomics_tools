@@ -50,7 +50,7 @@ def get_randomized_clusters(shortstack_loci, chr_lengths):
     for cluster in shortstack_loci:
         cluster_name = cluster[0]
         cluster_length = cluster[1]
-        while True:  # Gross hacky way of doing this
+        while True:  # Amateur hackiness
             random_record = random.choice(chr_lengths)
             chromosome = random_record[0]
             seq_length = random_record[1]
@@ -101,22 +101,81 @@ def overlap_randomized_clusters_results(results_dict, randomized_clusters,
                 feature_stop = results_dict[chromosome][feature_id][1]
                 for cluster in randomized_clusters[chromosome]:
                     cluster_start = randomized_clusters[chromosome][cluster][0]
-                    cluster_stop = randomized_clusters[chromosome][cluster][1]
                     if upstream_bp > 0 and feature_start - upstream_bp <= cluster_start <= feature_start:
                         upstream_overlaps += 1
                     if feature_body and feature_start <= cluster_start <= feature_stop:
                         body_overlaps += 1
                     if downstream_bp > 0 and feature_stop + downstream_bp >= cluster_start >= feature_stop:
                         downstream_overlaps += 1
-    print([upstream_overlaps, body_overlaps, downstream_overlaps])
     return [upstream_overlaps, body_overlaps, downstream_overlaps]
 
 
-loci_tsv = 'WT_ovule_2rpm_mincov_75_pad_loci.tsv'
-fasta_file = 'ro18_v1.2.fa'
+def bootstrapper(loci_tsv, fasta_file, input_deseq2_results, upstream_bp,
+                 downstream_bp, feature_body, bootstraps, output_file):
+    shortstack_loci = get_shortstack_clusters(loci_tsv)
+    chr_lengths = get_chromosome_lengths(fasta_file)
+    deseq2_results = parse_deseq2_results(input_deseq2_results)
+    overlap_header = ['upstream', 'body', 'downstream']
+    with open(output_file, 'w') as output_handle:
+        output_writer = csv.writer(output_handle)
+        output_writer.writerow(overlap_header)
+        for i in range(bootstraps):
+            randomized_clusters = get_randomized_clusters(
+                shortstack_loci, chr_lengths)
+            overlaps = overlap_randomized_clusters_results(
+                deseq2_results, randomized_clusters, upstream_bp,
+                downstream_bp, feature_body)
+            print('Bootstrap' + str(i + 1) + ':', overlaps)
+            output_writer.writerow(overlaps)
+        print('Done!')
 
-shortstack_loci = get_shortstack_clusters(loci_tsv)
-chr_lengths = get_chromosome_lengths(fasta_file)
-randomized_clusters = get_randomized_clusters(shortstack_loci, chr_lengths)
-results = parse_deseq2_results('results_fert_4-fold_padj_1e-12_annotated.csv')
-overlap_randomized_clusters_results(results, randomized_clusters, 1000, 1000, True)
+
+# Parse command line options
+
+parser = ArgumentParser(
+    description='Randomize shortstack loci and look for overlap with deseq2 '
+    'results')
+parser.add_argument(
+    '--results',
+    help='Input DESeq2 Results file, annotated for with start'
+    ' and stop coordinates',
+    metavar='File')
+parser.add_argument(
+    '--ssloci', help='Input ShortStack loci file', metavar='File')
+parser.add_argument('--fasta', help='Input genome fasta file', metavar='File')
+parser.add_argument(
+    '--upstream',
+    help='Distance upstream to look for overlap',
+    type=int,
+    default=0)
+parser.add_argument(
+    '--downstream',
+    help='Distance downstream from gene to look for overlap',
+    type=int,
+    default=0)
+parser.add_argument(
+    '--body',
+    help='Also look for overlap over the body of the feature',
+    action='store_true',
+    default=False)
+parser.add_argument(
+    '--bootstraps',
+    help='Number of randomization bootstraps to perform',
+    type=int,
+    default=1)
+
+results_file = parser.parse_args().results
+loci_tsv = parser.parse_args().ssloci
+fasta_file = parser.parse_args().fasta
+upstream = parser.parse_args().upstream
+body = parser.parse_args().body
+downstream = parser.parse_args().downstream
+bootstraps = parser.parse_args().bootstraps
+output_file = results_file.rsplit('.', 1)[0] + (
+    '_' + str(bootstraps) + '_bootstraps_random_loci_overlap_' + str(upstream)
+    + '_up_' + str(downstream) + '_down_' + str(body).lower() + '_body.csv')
+
+# Run the bootstrapper function to get the randomized overlaps
+
+bootstrapper(loci_tsv, fasta_file, results_file, upstream, downstream, body,
+             bootstraps, output_file)
