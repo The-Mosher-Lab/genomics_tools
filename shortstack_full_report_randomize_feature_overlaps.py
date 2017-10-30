@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 # Author: Jeffrey Grover
-# Purpose: Find small RNA clusters from a ShortStack "full report" file that
-# overlap with features in a gtf or gff3
+# Purpose: Randomize the positions of shortstack loci from a results.txt and
+# and find overlap with features in a gtf or gff3
 # Created: 10/2017
 
 import csv
@@ -29,10 +29,14 @@ def get_chromosome_lengths(fasta_file):
     return chr_lengths
 
 
-def get_shortstack_clusters(loci_tsv):
+def get_shortstack_clusters(loci_file):
     shortstack_loci = []
-    with open(loci_tsv, 'r') as input_handle:
-        reader = csv.reader(input_handle, delimiter='\t')
+    if loci_file.split('.')[1] == 'tsv':
+        loci_delimiter = '\t'
+    elif loci_file.split('.')[1] == 'csv':
+        loci_delimiter = ','
+    with open(loci_file, 'r') as input_handle:
+        reader = csv.reader(input_handle, delimiter=loci_delimiter)
         next(reader)  # Skip header
         for row in reader:
             cluster_name = row[1]
@@ -91,10 +95,8 @@ def parse_gff(input_gff, gff_feature):
         for row in input_file:
             if row[2] == gff_feature:
                 chromosome = row[0]
-                feature = row[2]
                 start = int(row[3])
                 stop = int(row[4])
-                strand = row[6]
                 feature_id = str(row[8].split(';')[0])[3:]
                 if chromosome not in gff_dict:
                     gff_dict[chromosome] = {}
@@ -107,11 +109,11 @@ def overlap_randomized_clusters(anno_dict, randomized_clusters, upstream_bp,
     upstream_overlaps = 0
     downstream_overlaps = 0
     body_overlaps = 0
-    for chromosome in gtf_dict:
+    for chromosome in anno_dict:
         if chromosome in randomized_clusters:
-            for feature_id in gtf_dict[chromosome]:
-                feature_start = gtf_dict[chromosome][feature_id][0]
-                feature_stop = gtf_dict[chromosome][feature_id][1]
+            for feature_id in anno_dict[chromosome]:
+                feature_start = anno_dict[chromosome][feature_id][0]
+                feature_stop = anno_dict[chromosome][feature_id][1]
                 for cluster in randomized_clusters[chromosome]:
                     cluster_start = randomized_clusters[chromosome][cluster][0]
                     if upstream_bp > 0 and feature_start - upstream_bp <= cluster_start <= feature_start:
@@ -120,21 +122,26 @@ def overlap_randomized_clusters(anno_dict, randomized_clusters, upstream_bp,
                         body_overlaps += 1
                     if downstream_bp > 0 and feature_stop + downstream_bp >= cluster_start >= feature_stop:
                         downstream_overlaps += 1
-    return [upstream_overlaps, body_overlaps, downstream_overlaps]
+    overlaps = [upstream_overlaps, body_overlaps, downstream_overlaps]
+    return overlaps
 
 
-def bootstrapper(loci_tsv, fasta_file, anno_file, feature, upstream_bp,
-                 downstream_bp, feature_body, bootstraps, output_file):
+def bootstrapper(loci_tsv, fasta_file, anno_type, anno_file, feature,
+                 upstream_bp, downstream_bp, feature_body, bootstraps,
+                 output_file):
     shortstack_loci = get_shortstack_clusters(loci_tsv)
     chr_lengths = get_chromosome_lengths(fasta_file)
-    gtf_features = parse_gtf(anno_file, feature)
+    if anno_type == 'gtf':
+        anno_dict = parse_gtf(anno_file, feature)
+    elif anno_type == 'gff3':
+        anno_dict = parse_gff(anno_file, feature)
     overlap_header = ['upstream', 'body', 'downstream']
     with open(output_file, 'w') as output_handle:
         output_writer = csv.writer(output_handle)
         output_writer.writerow(overlap_header)
         for i in range(bootstraps):
-            randomized_clusters = get_randomized_clusters(
-                shortstack_loci, chr_lengths)
+            randomized_clusters = randomize_clusters(shortstack_loci,
+                                                     chr_lengths)
             overlaps = overlap_randomized_clusters(
                 anno_dict, randomized_clusters, upstream_bp, downstream_bp,
                 feature_body)
@@ -149,41 +156,43 @@ parser = ArgumentParser(
     description='Randomize shortstack loci and look for overlap with gtf '
     'features')
 parser.add_argument(
-    'a',
-    'anno_type',
+    '-a',
+    '--anno_type',
     help='Type of annotation, either gff3 or gtf',
     choices=('gff3', 'gtf'))
 parser.add_argument(
-    'g', 'anno_file', help='Input gff3 or gtf file', metavar='File')
+    '-g', '--anno_file', help='Input gff3 or gtf file', metavar='File')
 parser.add_argument(
-    'f',
-    'feature',
+    '-f',
+    '--feature',
     help='Feature to look for overlap with from gtf3 file',
     type=str)
 parser.add_argument(
-    'l', 'ssloci', help='Input ShortStack loci file', metavar='File')
+    '-l', '--ssloci', help='Input ShortStack loci file (.tsv/.csv)', metavar='File')
 parser.add_argument('--fasta', help='Input genome fasta file', metavar='File')
 parser.add_argument(
-    'u',
-    'upstream',
+    '-u',
+    '--upstream',
     help='Distance upstream to look for overlap',
+    metavar='bp',
     type=int,
     default=0)
 parser.add_argument(
-    'd',
-    'downstream',
+    '-d',
+    '--downstream',
     help='Distance downstream from gene to look for overlap',
+    metavar='bp',
     type=int,
     default=0)
 parser.add_argument(
-    'b',
-    'body',
+    '-b',
+    '--body',
     help='Also look for overlap over the body of the feature',
     action='store_true',
     default=False)
 parser.add_argument(
-    'r',
-    'bootstraps',
+    '-r',
+    '--bootstraps',
     help='Number of randomization bootstraps to perform',
     type=int,
     default=1)
@@ -191,22 +200,18 @@ parser.add_argument(
 anno_type = parser.parse_args().anno_type
 anno_file = parser.parse_args().anno_file
 feature = parser.parse_args().feature
-loci_tsv = parser.parse_args().ssloci
+loci_file = parser.parse_args().ssloci
 fasta_file = parser.parse_args().fasta
 upstream = parser.parse_args().upstream
 body = parser.parse_args().body
 downstream = parser.parse_args().downstream
 bootstraps = parser.parse_args().bootstraps
-output_file = anno_file.split('.')[0] + (
+output_file = loci_file.split('.')[0] + (
     '_' + str(bootstraps) + '_bootstraps_random_' + feature + '_overlap_' +
     str(upstream) + '_up_' + str(downstream) + '_down_' + str(body).lower() +
     '_body.csv')
 
 # Run the functions to get the overlap
 
-if anno_type == 'gtf':
-    bootstrapper(loci_tsv, fasta_file, anno_file, feature, upstream,
-                 downstream, body, bootstraps, output_file)
-elif anno_type == 'gff3':
-    bootstrapper(loci_tsv, fasta_file, anno_file, feature, upstream,
-                 downstream, body, bootstraps, output_file)
+bootstrapper(loci_file, fasta_file, anno_type, anno_file, feature, upstream,
+             downstream, body, bootstraps, output_file)
