@@ -2,7 +2,7 @@
 
 # Author: Jeffrey Grover
 # Purpose: Randomize the positions of shortstack loci from a results.txt and
-# and find overlap with features in a gtf or gff3
+# and find overlap with features in a gtf, gff3, or deseq2 results.
 # Created: 10/2017
 
 import csv
@@ -104,6 +104,22 @@ def parse_gff(input_gff, gff_feature):
         return gff_dict
 
 
+def parse_deseq2_results(deseq2_results):
+    results_dict = {}
+    with open(deseq2_results, 'r') as input_handle:
+        input_reader = csv.reader(input_handle)
+        next(input_reader)
+        for row in input_reader:
+            chromosome = row[0]
+            feature_id = row[1]
+            start = int(row[3])
+            stop = int(row[4])
+            if chromosome not in results_dict:
+                results_dict[chromosome] = {}
+            results_dict[chromosome][feature_id] = [start, stop]
+    return results_dict
+
+
 def overlap_randomized_clusters(anno_dict, randomized_clusters, upstream_bp,
                                 downstream_bp, feature_body):
     upstream_overlaps = 0
@@ -135,6 +151,8 @@ def bootstrapper(loci_tsv, fasta_file, anno_type, anno_file, feature,
         anno_dict = parse_gtf(anno_file, feature)
     elif anno_type == 'gff3':
         anno_dict = parse_gff(anno_file, feature)
+    elif anno_type == 'deseq2':
+        anno_dict = parse_deseq2_results(anno_file)
     overlap_header = ['upstream', 'body', 'downstream']
     with open(output_file, 'w') as output_handle:
         output_writer = csv.writer(output_handle)
@@ -153,22 +171,30 @@ def bootstrapper(loci_tsv, fasta_file, anno_type, anno_file, feature,
 # Parse command line options
 
 parser = ArgumentParser(
-    description='Randomize shortstack loci and look for overlap with gtf '
-    'features')
+    description='Randomize shortstack loci and look for overlap with gtf/gff3 '
+    'features or deseq2 differentially expressed features annotated with start'
+    ' and stop coordinates annotated with deseq2_results_gff_annotate.py'
+)
 parser.add_argument(
     '-a',
     '--anno_type',
-    help='Type of annotation, either gff3 or gtf',
-    choices=('gff3', 'gtf'))
+    help='Type of annotation, either gff3, gtf, or deseq2',
+    choices=('gff3', 'gtf', 'deseq2'))
 parser.add_argument(
-    '-g', '--anno_file', help='Input gff3 or gtf file', metavar='File')
+    '-g',
+    '--anno_file',
+    help='Input gff3, gtf, or deseq2 results file',
+    metavar='File')
 parser.add_argument(
     '-f',
     '--feature',
     help='Feature to look for overlap with from gtf3 file',
     type=str)
 parser.add_argument(
-    '-l', '--ssloci', help='Input ShortStack loci file (.tsv/.csv)', metavar='File')
+    '-l',
+    '--ssloci',
+    help='Input ShortStack loci file (.tsv/.csv)',
+    metavar='File')
 parser.add_argument('--fasta', help='Input genome fasta file', metavar='File')
 parser.add_argument(
     '-u',
