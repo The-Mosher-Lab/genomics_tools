@@ -157,28 +157,33 @@ parser.add_argument(
 parser.add_argument(
     'g', 'anno_file', help='Input gff3 or gtf file', metavar='File')
 parser.add_argument(
+    'f',
     'feature',
     help='Feature to look for overlap with from gtf3 file',
     type=str)
 parser.add_argument(
-    'ssloci', help='Input ShortStack loci file', metavar='File')
+    'l', 'ssloci', help='Input ShortStack loci file', metavar='File')
 parser.add_argument('--fasta', help='Input genome fasta file', metavar='File')
 parser.add_argument(
+    'u',
     'upstream',
     help='Distance upstream to look for overlap',
     type=int,
     default=0)
 parser.add_argument(
+    'd',
     'downstream',
     help='Distance downstream from gene to look for overlap',
     type=int,
     default=0)
 parser.add_argument(
+    'b',
     'body',
     help='Also look for overlap over the body of the feature',
     action='store_true',
     default=False)
 parser.add_argument(
+    'r',
     'bootstraps',
     help='Number of randomization bootstraps to perform',
     type=int,
