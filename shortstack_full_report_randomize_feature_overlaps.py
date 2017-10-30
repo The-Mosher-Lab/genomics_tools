@@ -61,8 +61,7 @@ def randomize_clusters(shortstack_loci, chr_lengths):
         if chromosome not in randomized_clusters:
             randomized_clusters[chromosome] = {}
         randomized_clusters[chromosome][cluster_name] = [
-            randomized_cluster_start, randomized_cluster_stop,
-            cluster_length
+            randomized_cluster_start, randomized_cluster_stop, cluster_length
         ]
     return randomized_clusters
 
