@@ -173,8 +173,7 @@ def bootstrapper(loci_tsv, fasta_file, anno_type, anno_file, feature,
 parser = ArgumentParser(
     description='Randomize shortstack loci and look for overlap with gtf/gff3 '
     'features or deseq2 differentially expressed features annotated with start'
-    ' and stop coordinates annotated with deseq2_results_gff_annotate.py'
-)
+    ' and stop coordinates annotated with deseq2_results_gff_annotate.py')
 parser.add_argument(
     '-a',
     '--anno_type',
@@ -233,9 +232,9 @@ body = parser.parse_args().body
 downstream = parser.parse_args().downstream
 bootstraps = parser.parse_args().bootstraps
 output_file = loci_file.split('.')[0] + (
-    '_' + str(bootstraps) + '_bootstraps_random_' + feature + '_overlap_' +
-    str(upstream) + '_up_' + str(downstream) + '_down_' + str(body).lower() +
-    '_body.csv')
+    '_' + str(bootstraps) + '_bootstraps_random_' + anno_type + '_' + feature +
+    '_overlap_' + str(upstream) + '_up_' + str(downstream) + '_down_' +
+    str(body).lower() + '_body.csv')
 
 # Run the functions to get the overlap
 
