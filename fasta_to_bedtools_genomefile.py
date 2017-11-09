@@ -3,7 +3,7 @@
 # Author: Jeffrey Grover
 # Purpose: Convert a .fasta file into a tab delimited that can be used with
 # bedtools. With bedtools shuffle for example.
-# Created: 10/2017
+# Created: 11/2017
 
 import csv
 from argparse import ArgumentParser
