@@ -14,7 +14,7 @@ output_dir="./${input_file}_randomized_${bootstraps}_bootstraps/"
 mkdir -p "$output_dir"
 for ((i=1; i<=$bootstraps; i++))
 do
-    output_file="${output_dir}${input_file%.bam}_$i.bed"
+    output_file="${output_dir}${input_file%.bed}_$i.bed"
     bedtools shuffle -noOverlapping -i "$input_file" -g "$genome" > \
     "$output_file"
 done
