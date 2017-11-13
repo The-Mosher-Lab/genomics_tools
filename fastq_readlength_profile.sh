@@ -6,4 +6,4 @@
 
 # Use 'find . -name "(*.fastq)" -exec "./fastq_length_profile.sh" {} \;' to batch process
 
-cat "$1" | awk '{if(NR%4==2) print length($1)}' | sort | uniq -c > "${1%.fastq}.readlengths.txt"
+awk '{if(NR%4==2) print length($1)}' "$1" | sort | uniq -c > "${1%.fastq}.readlengths.txt"
