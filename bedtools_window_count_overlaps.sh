@@ -7,4 +7,4 @@
 
 # Pass through the file to run as a positional variable
 
-awk '{sum+=$7;} END { print sum }' "$1" > "${1%.txt}_overlaps.txt"
+awk '{sum+=$7;} END { print sum }' "$1" > "${1%.tsv}_counts.txt"
