@@ -38,7 +38,7 @@ parser.add_argument(
     metavar='.csv')
 
 input_full_report = parser.parse_args().ssfullreport
-output_bed = input_full_report.rsplit('.', 1)[0] + '.bed'
+output_bed = input_full_report.rstrip('.csv') + '.bed'
 
 # Convert the file
 
