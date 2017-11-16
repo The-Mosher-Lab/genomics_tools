@@ -11,20 +11,20 @@ from argparse import ArgumentParser
 
 
 def ssfullreport_to_bed(input_full_report, output_bed):
-    with open(input_full_report, 'r') as input_handle:
-        with open(output_bed, 'w') as output_handle:
-            input_reader = csv.reader(input_handle)
-            output_writer = csv.writer(output_handle, delimiter='\t')
-            next(input_reader)
-            for row in input_reader:
-                chromosome = row[0].split(':')[0]
-                start = int(row[0].split(':')[1].split('-')[0]) - 1  # 0-based
-                stop = int(row[0].split(':')[1].split('-')[1])  # 1-based
-                name = row[1]
-                score = '.'
-                strand = row[7]
-                output_writer.writerow(
-                    [chromosome, start, stop, name, score, strand])
+    with open(input_full_report, 'r') as input_handle, \
+         open(output_bed, 'w') as output_handle:
+        input_reader = csv.reader(input_handle)
+        output_writer = csv.writer(output_handle, delimiter='\t')
+        next(input_reader)
+        for row in input_reader:
+            chromosome = row[0].split(':')[0]
+            start = int(row[0].split(':')[1].split('-')[0]) - 1  # 0-based
+            stop = int(row[0].split(':')[1].split('-')[1])  # 1-based
+            name = row[1]
+            score = '.'
+            strand = row[7]
+            output_writer.writerow(
+                [chromosome, start, stop, name, score, strand])
 
 
 # Parse command line options
