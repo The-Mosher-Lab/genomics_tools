@@ -36,13 +36,13 @@ parser = ArgumentParser(
 parser.add_argument('input_bed', help='Input .bed file', metavar='FILE')
 parser.add_argument(
     '--min',
-    help='Minimum feature size in nt, default=0',
+    help='Minimum feature size in nt',
     metavar='INT',
     type=int,
     default=None)
 parser.add_argument(
     '--max',
-    help='Maximum feature size in nt, default=1000',
+    help='Maximum feature size in nt',
     metavar='INT',
     type=int,
     default=None)
