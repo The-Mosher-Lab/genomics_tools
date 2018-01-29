@@ -50,7 +50,7 @@ parser.add_argument(
 input_bed = parser.parse_args().input_bed
 min_length = parser.parse_args().min
 max_length = parser.parse_args().max
-output_bed = input_bed.rstrip('.bed') + '_min%s_max%s.bed' % (min_length,
+output_bed = input_bed.replace('.bed', '') + '_min%s_max%s.bed' % (min_length,
                                                               max_length)
 
 # Run the functions to output the new bed file
