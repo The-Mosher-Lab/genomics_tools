@@ -45,7 +45,8 @@ def create_bins(bed_dict, window_size, bin_width, output_prefix):
                 score = bed_dict[feature_id]['score']
                 strand = bed_dict[feature_id]['strand']
                 output_row = [chromosome, start, stop, feature_id, score, strand]
-                upstream_writer.writerow(output_row)
+                if start >= 0 and stop >= 0:
+                    upstream_writer.writerow(output_row)
 
 # Create the downstream bins
 
@@ -63,7 +64,8 @@ def create_bins(bed_dict, window_size, bin_width, output_prefix):
                 score = bed_dict[feature_id]['score']
                 strand = bed_dict[feature_id]['strand']
                 output_row = [chromosome, start, stop, feature_id, score, strand]
-                downstream_writer.writerow(output_row)
+                if start >= 0 and stop >= 0:
+                    downstream_writer.writerow(output_row)
 
 # Create the feature body bins
 
@@ -92,7 +94,8 @@ def create_bins(bed_dict, window_size, bin_width, output_prefix):
                 score = bed_dict[feature_id]['score']
                 strand = bed_dict[feature_id]['strand']
                 output_row = [chromosome, start, stop, feature_id, score, strand]
-                body_writer.writerow(output_row)
+                if start >= 0 and stop >= 0:
+                    body_writer.writerow(output_row)
 
 
 # Parse command line options
