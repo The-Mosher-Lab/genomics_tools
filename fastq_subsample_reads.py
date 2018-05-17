@@ -7,6 +7,7 @@
 # Randomly subsets the reads from a fastq file based on user-defined parameters
 
 import random
+import subprocess
 from sys import exit
 from argparse import ArgumentParser
 
@@ -14,35 +15,33 @@ from argparse import ArgumentParser
 
 
 def count_fastq_records(fastq_file):
-    fastq_lines = 0
-    with open(fastq_file) as input_handle:
-        for line in input_handle:
-            fastq_lines += 1
-    fastq_records = int(fastq_lines / 4)
-    return fastq_records
+    fastq_lines = int(subprocess.getoutput('wc -l' + fastq_file))
+    num_fastq_records = int(fastq_lines / 4)
+    return num_fastq_records
 
 
-def random_fastq_indices(fastq_records, reads_to_sample):
+def random_fastq_indices(num_fastq_records, reads_to_sample):
     for i in range(reads_to_sample):
         random_indices = set(
-            random.sample(range(fastq_records + 1), reads_to_sample))
+            random.sample(range(num_fastq_records + 1), reads_to_sample))
     return random_indices
 
 
-def subsample(fastq_file, fastq_records, random_indices, output_file):
+def subsample(fastq_file, num_fastq_records, random_indices, output_file):
     record_number = 0
     with open(fastq_file, 'r') as input_handle, open(output_file,
                                                      'w') as output_handle:
         for line1 in input_handle:
-            line2 = next(input_handle)
-            line3 = next(input_handle)
-            line4 = next(input_handle)
-            if record_number in random_indices:
-                output_handle.write(line1)
-                output_handle.write(line2)
-                output_handle.write(line3)
-                output_handle.write(line4)
             record_number += 1
+            if record_number in random_indices:
+                read_id = line1
+                read_seq = next(input_handle)
+                separator = next(input_handle)
+                read_quality = next(input_handle)
+                output_handle.write(read_id)
+                output_handle.write(read_seq)
+                output_handle.write(separator)
+                output_handle.write(read_quality)
 
 
 # Parse command line options
@@ -68,12 +67,12 @@ if not fraction and not number:
 
 # Count fastq records
 
-fastq_records = count_fastq_records(fastq_file)
+num_fastq_records = count_fastq_records(fastq_file)
 
 # Determine reads to sample
 
 if fraction:
-    reads_to_sample = int(fastq_records * fraction)
+    reads_to_sample = int(num_fastq_records * fraction)
 else:
     reads_to_sample = number
 
@@ -84,5 +83,5 @@ output_file = fastq_file.split('.fastq')[0] + (
 
 # Generate random indices and output
 
-random_indices = random_fastq_indices(fastq_records, reads_to_sample)
-subsample(fastq_file, fastq_records, random_indices, output_file)
+random_indices = random_fastq_indices(num_fastq_records, reads_to_sample)
+subsample(fastq_file, num_fastq_records, random_indices, output_file)
