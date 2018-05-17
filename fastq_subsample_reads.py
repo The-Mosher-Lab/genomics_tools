@@ -31,10 +31,9 @@ def subsample(fastq_file, num_fastq_records, random_indices, output_file):
     record_number = 0
     with open(fastq_file, 'r') as input_handle, open(output_file,
                                                      'w') as output_handle:
-        for line1 in input_handle:
+        for read_id in input_handle:
             record_number += 1
             if record_number in random_indices:
-                read_id = line1
                 read_seq = next(input_handle)
                 separator = next(input_handle)
                 read_quality = next(input_handle)
@@ -42,6 +41,9 @@ def subsample(fastq_file, num_fastq_records, random_indices, output_file):
                 output_handle.write(read_seq)
                 output_handle.write(separator)
                 output_handle.write(read_quality)
+            else:
+                for i in range(3):
+                    next(input_handle)
 
 
 # Parse command line options
