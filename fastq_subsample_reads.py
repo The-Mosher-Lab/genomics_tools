@@ -5,6 +5,7 @@
 # Created: 5/2018
 
 # Randomly subsets the reads from a fastq file based on user-defined parameters
+# Only works on single-end reads until I feel like updating for PE reads
 
 import random
 import subprocess
@@ -15,12 +16,12 @@ from argparse import ArgumentParser
 
 
 def count_fastq_records(fastq_file):
-    fastq_lines = int(subprocess.getoutput('wc -l' + fastq_file))
+    fastq_lines = int(subprocess.getoutput('wc -l' + fastq_file))  # wc is fast
     num_fastq_records = int(fastq_lines / 4)
     return num_fastq_records
 
 
-def random_fastq_indices(num_fastq_records, reads_to_sample):
+def get_random_indices(num_fastq_records, reads_to_sample):
     for i in range(reads_to_sample):
         random_indices = set(
             random.sample(range(num_fastq_records + 1), reads_to_sample))
@@ -34,16 +35,12 @@ def subsample(fastq_file, num_fastq_records, random_indices, output_file):
         for read_id in input_handle:
             record_number += 1
             if record_number in random_indices:
-                read_seq = next(input_handle)
-                separator = next(input_handle)
-                read_quality = next(input_handle)
                 output_handle.write(read_id)
-                output_handle.write(read_seq)
-                output_handle.write(separator)
-                output_handle.write(read_quality)
+                for i in range(3):
+                    output_handle.write(next(input_handle))  # Output record
             else:
                 for i in range(3):
-                    next(input_handle)
+                    next(input_handle)  # Skip record
 
 
 # Parse command line options
@@ -85,5 +82,5 @@ output_file = fastq_file.split('.fastq')[0] + (
 
 # Generate random indices and output
 
-random_indices = random_fastq_indices(num_fastq_records, reads_to_sample)
+random_indices = get_random_indices(num_fastq_records, reads_to_sample)
 subsample(fastq_file, num_fastq_records, random_indices, output_file)
