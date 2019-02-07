@@ -9,21 +9,20 @@
 
 import re
 from argparse import ArgumentParser
+from collections import OrderedDict
 
 # Functions block
 
 
 def load_fasta(input_fasta):
-    fasta_seqs = {}
+    fasta_dict = OrderedDict()
     with open(input_fasta, 'r') as input_handle:
-        head = None
         for line in input_handle:
             if line.startswith('>'):
-                seq_ID = line.split('>')[1].split(' ')[0]
-            else:
-                sequence = line.strip()
-                fasta_seqs[sequence] = {'id': seq_ID, 'count': 0}
-    return fasta_seqs
+                seq_ID = line[1:].split(' ')[0]
+                sequence = next(input_handle).strip()
+                fasta_dict[sequence] = {'id': seq_ID, 'count': 0}
+    return fasta_dict
 
 
 def search_fastq(input_fastq, search_dict):
