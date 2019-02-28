@@ -54,7 +54,7 @@ coverage = depth[0] / genome_size
 
 # Output to stdout
 
-print('Genome Size:', genome_size, '\t')
-print('Total Depth:', depth[0], '\t')
-print('Average Depth:', depth[1], '\t')
-print('X Coverage:', coverage, '\t')
+print('Genome Size:', genome_size)
+print('Total Depth:', depth[0])
+print('Average Depth:', depth[1])
+print('X Coverage:', coverage)
