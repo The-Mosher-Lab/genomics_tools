@@ -49,10 +49,10 @@ if not cg_bedgraph and not chg_bedgraph and not chh_bedgraph:
     exit
 if cg_bedgraph:
     cg_methylation = methyl_calc(cg_bedgraph)
-    print('CG Methylation', cg_methylation, sep='\t')
+    print('CG', cg_methylation, sep='\t')
 if chg_bedgraph:
     chg_methylation = methyl_calc(chg_bedgraph)
-    print('CHG Methylation', chg_methylation, sep='\t')
+    print('CHG', chg_methylation, sep='\t')
 if chh_bedgraph:
     chh_methylation = methyl_calc(chh_bedgraph)
-    print('CHH Methylation', chh_methylation, sep='\t')
+    print('CHH', chh_methylation, sep='\t')
