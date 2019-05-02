@@ -13,10 +13,10 @@ def methyl_calc(input_bedgraph):
     met_c = 0
     unmet_c = 0
     with open(input_bedgraph, 'r') as input_handle:
-        next(input_handle)  # Skip header
         for line in input_handle:
-            met_c += int(line.split()[4])
-            unmet_c += int(line.split()[5])
+            if not line.startswith('track'):  # Skip header
+                met_c += int(line.split()[4])
+                unmet_c += int(line.split()[5])
     return (met_c / (met_c + unmet_c)) * 100
 
 
