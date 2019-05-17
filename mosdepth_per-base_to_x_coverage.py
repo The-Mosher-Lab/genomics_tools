@@ -5,7 +5,6 @@
 # per-base coverage output
 # Created: 2/2019
 
-import csv
 import gzip
 from argparse import ArgumentParser
 

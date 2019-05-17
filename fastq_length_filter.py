@@ -4,9 +4,6 @@
 # Purpose: Filter .fastq reads between sizes defined by user input.
 # Created: 12/2016
 
-# Use find -exec to batch process:
-# find . -name "*.fastq" -exec "./fastq_length_filter.py" {} --min 19 --max 26 \;
-
 from argparse import ArgumentParser
 
 

@@ -4,9 +4,6 @@
 # Purpose: Read a .fasta file and output only unique sequences
 # Created: 12/2016
 
-# Extracts only the unique reads from a .fasta file
-# Use find -exec to batch process: ex. 'find . -name "*.fasta" -exec "./fasta_unique_sequences.py" {} \;'
-
 import re
 from argparse import ArgumentParser
 from itertools import groupby

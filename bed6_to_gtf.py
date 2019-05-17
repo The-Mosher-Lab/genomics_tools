@@ -16,19 +16,30 @@ def bed_to_gtf(input_file, anno_source, feature_type):
             stop = int(entry[2])
             name = entry[3]
             strand = entry[5]
-            print(chrom, anno_source, feature_type, start, stop, '.', strand, '.',
-                  'gene_id "%s"; gene_name "%s"'
-                  % (name, name), sep='\t')
+            print(chrom,
+                  anno_source,
+                  feature_type,
+                  start,
+                  stop,
+                  '.',
+                  strand,
+                  '.',
+                  'gene_id "%s"; gene_name "%s"' % (name, name),
+                  sep='\t')
 
 
 # Parse command line options
 
-parser = ArgumentParser(description='Converts a .bed file with 6 columns to gtf. It requires that you know the '
-                                    'feature type and source fields and input them using the appropriate command line '
-                                    'option.')
+parser = ArgumentParser(
+    description=
+    'Converts a .bed file with 6 columns to gtf. It requires that you know the '
+    'feature type and source fields and input them using the appropriate command line '
+    'option.')
 parser.add_argument('input_path', help='File to process', metavar='File')
 parser.add_argument('--source', help='Source of the annotation', type=str)
-parser.add_argument('--feature', help='The type of feature contained within the .bed file', type=str)
+parser.add_argument('--feature',
+                    help='The type of feature contained within the .bed file',
+                    type=str)
 
 input_path = parser.parse_args().input_path
 source = parser.parse_args().source

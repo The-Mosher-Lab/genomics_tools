@@ -4,9 +4,6 @@
 # Purpose: Filter .fastq reads between sizes defined by user input.
 # Created: 12/2016
 
-# Extracts reads from a .fastq file and creates a multiline fasta file from them
-# Use find -exec to batch process: ex. 'find . -name "*.fastq" -exec "./fastq_to_fasta.py" {} \;'
-
 import re
 from argparse import ArgumentParser
 

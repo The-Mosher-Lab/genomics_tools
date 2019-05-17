@@ -4,6 +4,4 @@
 # Created: 12/2016
 # Purpose: Reads fastq files and outputs counts of read lengths within the file
 
-# Use 'find . -name "(*.fastq)" -exec "./fastq_length_profile.sh" {} \;' to batch process
-
 awk '{if(NR%4==2) print length($1)}' "$1" | sort | uniq -c > "${1%.fastq}.readlengths.txt"
