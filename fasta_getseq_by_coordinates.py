@@ -6,13 +6,12 @@
 
 from argparse import ArgumentParser
 from itertools import groupby
-import gzip
 
 # Functions
 
 
 def fasta_iterate(fasta_file):
-    with gzip.open(fasta_file, 'rt') as reader:
+    with open(fasta_file, 'r') as reader:
         fasta_reader = (
             x[1] for x in groupby(reader, lambda line: line.startswith('>')))
         for header in fasta_reader:
