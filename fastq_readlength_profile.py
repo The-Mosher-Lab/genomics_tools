@@ -10,7 +10,7 @@ from argparse import ArgumentParser
 
 
 def fastq_length_profile(input_fastq):
-    fastq_lengths_dict = {} 
+    fastq_lengths_dict = {}
     with open(input_fastq) as input_handle:
         n = 0
         for line in input_handle:

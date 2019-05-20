@@ -7,6 +7,7 @@
 # This was created to search through small RNA fastq files for exact matches to
 # a list of queries in .fasta format and output a list of counts.
 
+import gzip
 from argparse import ArgumentParser
 from collections import OrderedDict
 
@@ -15,7 +16,7 @@ from collections import OrderedDict
 
 def load_fasta(input_fasta):
     fasta_dict = OrderedDict()
-    with open(input_fasta, 'r') as input_handle:
+    with gzip.open(input_fasta, 'rt') as input_handle:
         for line in input_handle:
             if line.startswith('>'):
                 seq_ID = line[1:].split(' ')[0]
@@ -25,7 +26,7 @@ def load_fasta(input_fasta):
 
 
 def search_fastq(input_fastq, search_dict):
-    with open(input_fastq, 'r') as input_handle:
+    with gzip.open(input_fastq, 'rt') as input_handle:
         n = 0
         for line in input_handle:
             n += 1
@@ -48,9 +49,8 @@ def output_counts(input_dict, lib_name):
 # Parse command line options
 
 parser = ArgumentParser(
-    description=
-    'Reads a list of sequences in .fasta format and counts occurances of that '
-    'sequence in a .fastq file.')
+    description='Reads a list of sequences in .fasta format and counts '
+    'occurances of that sequence in a .fastq file.')
 parser.add_argument('--fa',
                     help='Input .fasta',
                     metavar='File')
