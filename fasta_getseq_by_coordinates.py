@@ -13,7 +13,8 @@ from itertools import groupby
 def fasta_iterate(fasta_file):
     with open(fasta_file, 'r') as reader:
         fasta_reader = (
-            x[1] for x in groupby(reader, lambda line: line.startswith('>')))
+            x[1] for x in groupby(reader, lambda line: line.startswith('>'))
+        )
         for header in fasta_reader:
             chromosome = next(header).strip('>').rstrip('\n')
             seq = ''.join(s.strip() for s in next(fasta_reader))
