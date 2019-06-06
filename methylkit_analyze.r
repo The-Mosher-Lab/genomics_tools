@@ -54,8 +54,9 @@ dir.create(output_dir)
 
 
 # Load libraries
+# Because this is adapted from code run in a Jupyter notebook it depends on
+# a subset of the tidyverse. I could remove this dependency in the future.
 
-suppressMessages(library('dplyr', quietly = TRUE))
 suppressMessages(library('stringr', quietly = TRUE))
 suppressMessages(library('readr', quietly = TRUE))
 suppressMessages(library('methylKit', quietly = TRUE))
@@ -122,9 +123,24 @@ methylkit_analyze <- function(control_file, comparison_file, sample_id_control,
   print(str_c(c_context, ' Hypo-DMWs:', nrow(meth_diff_hypo)))
 
   # Export results
-  write_csv(meth_diff_windows, str_c(output_dir, '/', sample_id_comparison, '_', sample_id_control, '_',c_context, '_norm_window_', window_size, '_', step_size, '_d', diff, '_q', q_val, '.csv'))
-  write_csv(meth_diff_hyper, str_c(output_dir, '/', sample_id_comparison, '_', sample_id_control, '_',c_context, '_norm_window_', window_size, '_', step_size, '_d', diff, '_q', q_val, '_hyper.csv'))
-  write_csv(meth_diff_hypo, str_c(output_dir, '/', sample_id_comparison, '_', sample_id_control, '_',c_context, '_norm_window_', window_size, '_', step_size, '_d', diff, '_q', q_val, '_hypo.csv'))
+  write_csv(meth_diff_windows,
+            str_c(output_dir, '/', sample_id_comparison, '_', sample_id_control,
+                  '_',c_context, '_norm_window_', window_size, '_', step_size,
+                  '_d', diff, '_q', q_val, '.csv'
+                  )
+            )
+  write_csv(meth_diff_hyper,
+            str_c(output_dir, '/', sample_id_comparison, '_', sample_id_control,
+                  '_',c_context, '_norm_window_', window_size, '_', step_size,
+                  '_d', diff, '_q', q_val, '_hyper.csv'
+                  )
+            )
+  write_csv(meth_diff_hypo,
+            str_c(output_dir, '/', sample_id_comparison, '_', sample_id_control,
+                  '_',c_context, '_norm_window_', window_size, '_', step_size,
+                  '_d', diff, '_q', q_val, '_hypo.csv'
+                  )
+            )
 }
 
 
