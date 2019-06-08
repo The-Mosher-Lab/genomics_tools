@@ -30,34 +30,40 @@ def output_seq(fasta_iterator, search_chromosome, start, end):
             exit()
 
 
-# Parse command line options
+def main():
 
-parser = ArgumentParser(
-    description='Pull a sequence from a fasta file by coordinates.')
-parser.add_argument(
-    'fasta',
-    help='An input fasta file to use as a reference',
-    metavar='FILE')
-parser.add_argument(
-    '-c',
-    '--chromosome',
-    help='An input chromosome ID to search through',
-    metavar='STRING')
-parser.add_argument(
-    '-s',
-    '--start',
-    help='Start position of the region to pull',
-    type=int,
-    metavar='INT')
-parser.add_argument(
-    '-n',
-    '--end',
-    help='End position of the region to pull',
-    type=int,
-    metavar='INT')
+    # Parse command line options
 
-args = parser.parse_args()
+    parser = ArgumentParser(
+        description='Pull a sequence from a fasta file by coordinates.')
+    parser.add_argument(
+        'fasta',
+        help='An input fasta file to use as a reference',
+        metavar='FILE')
+    parser.add_argument(
+        '-c',
+        '--chromosome',
+        help='An input chromosome ID to search through',
+        metavar='STRING')
+    parser.add_argument(
+        '-s',
+        '--start',
+        help='Start position of the region to pull',
+        type=int,
+        metavar='INT')
+    parser.add_argument(
+        '-n',
+        '--end',
+        help='End position of the region to pull',
+        type=int,
+        metavar='INT')
 
-# Process the file
+    args = parser.parse_args()
 
-output_seq(fasta_iterate(args.fasta), args.chromosome, args.start, args.end)
+    # Process the file
+
+    output_seq(fasta_iterate(args.fasta), args.chromosome, args.start, args.end)
+
+
+if __name__ == "__main__":
+    main()

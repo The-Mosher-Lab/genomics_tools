@@ -35,9 +35,7 @@ def parse_snps_to_dict(vcf_file):
                 if chromosome not in snps_dict:
                     snps_dict[chromosome] = {}
                 if position in snps_dict[chromosome]:
-                    exit(
-                        'Error: .vcf files should have exactly one call per position.'
-                    )
+                    exit('Error: .vcf files should have exactly one call per position.')
                 else:
                     snps_dict[chromosome][position] = (ref_base, alt_base)
     return snps_dict
@@ -58,36 +56,42 @@ def replace_snps(fasta_iterator, snps_dict, output_fasta, genotype):
             fasta_writer.write(''.join(bases) + '\n')
 
 
-# Parse command line options
+def main():
 
-parser = ArgumentParser(
-    description='Replace SNPs from a .vcf file into the correct positions in a'
-    ' .fasta file. Does not text wrap the output because the python textwrap '
-    'module is veeeery sloooow.')
-parser.add_argument(
-    '-f',
-    '--fasta',
-    help='An input fasta file to use as a reference',
-    metavar='FILE')
-parser.add_argument(
-    '-v',
-    '--vcf',
-    help='An input .vcf file with exactly one variant per position.',
-    metavar='FILE')
-parser.add_argument(
-    '-g',
-    '--genotype',
-    help='A string which will be added to the chromosome IDs and output '
-    'file-name indicating the genotype of the SNPs.',
-    metavar='STRING')
+    # Parse command line options
 
-fasta_file = parser.parse_args().fasta
-vcf_file = parser.parse_args().vcf
-genotype = parser.parse_args().genotype
-output_fasta = fasta_file.rsplit('.', 1)[0] + '.%s.snps.fa' % genotype
+    parser = ArgumentParser(
+        description='Replace SNPs from a .vcf file into the correct positions in a'
+        ' .fasta file. Does not text wrap the output because the python textwrap '
+        'module is veeeery sloooow.')
+    parser.add_argument(
+        '-f',
+        '--fasta',
+        help='An input fasta file to use as a reference',
+        metavar='FILE')
+    parser.add_argument(
+        '-v',
+        '--vcf',
+        help='An input .vcf file with exactly one variant per position.',
+        metavar='FILE')
+    parser.add_argument(
+        '-g',
+        '--genotype',
+        help='A string which will be added to the chromosome IDs and output '
+        'file-name indicating the genotype of the SNPs.',
+        metavar='STRING')
 
-# Process the .fasta and .vcf
+    fasta_file = parser.parse_args().fasta
+    vcf_file = parser.parse_args().vcf
+    genotype = parser.parse_args().genotype
+    output_fasta = fasta_file.rsplit('.', 1)[0] + '.%s.snps.fa' % genotype
 
-snps_dict = parse_snps_to_dict(vcf_file)
+    # Process the .fasta and .vcf
 
-replace_snps(fasta_iterate(fasta_file), snps_dict, output_fasta, genotype)
+    snps_dict = parse_snps_to_dict(vcf_file)
+
+    replace_snps(fasta_iterate(fasta_file), snps_dict, output_fasta, genotype)
+
+
+if __name__ == "__main__":
+    main()

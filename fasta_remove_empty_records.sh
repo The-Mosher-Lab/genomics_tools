@@ -2,8 +2,8 @@
 
 # Author: Jeffrey Grover
 # Created: 10/2017
-# Purpose: Remove empty records from a fasta file or similar file with a record separator
+# Purpose: Remove empty records from a fasta file
 
-# Takes two command line options, the record separator (in quotes) and the input file
+# Takes the input fastq as a command line argument
 
-awk '$2{print RS $0}' FS='\n' RS="$1" ORS= "$2"
+awk '$2{print RS $0}' FS='\n' RS="$1" ORS= ">"

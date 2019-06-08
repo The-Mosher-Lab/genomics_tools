@@ -25,9 +25,12 @@ def parse_bedtools_merge(input_file, basename):
 # Parse command line options
 
 parser = ArgumentParser(
-    description='Take the output from bedtools merge and assign unique IDs to each line')
+    description=
+    'Take the output from bedtools merge and assign unique IDs to each line')
 parser.add_argument('input_path', help='File to process', metavar='File')
-parser.add_argument('-b', '--basename', help='Basename to append ID number to for each record')
+parser.add_argument('-b',
+                    '--basename',
+                    help='Basename to append ID number to for each record')
 
 input_file = parser.parse_args().input_path
 basename = parser.parse_args().basename

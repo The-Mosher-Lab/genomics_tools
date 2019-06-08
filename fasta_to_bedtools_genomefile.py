@@ -13,11 +13,9 @@ from itertools import groupby
 
 
 def convert_fasta(fasta_file, output_file):
-    with open(fasta_file, 'r') as input_handle, open(output_file,
-                                                     'w') as output_handle:
+    with open(fasta_file, 'r') as input_handle, open(output_file, 'w') as output_handle:
         output_writer = csv.writer(output_handle, delimiter='\t')
-        for is_header, group in groupby(input_handle,
-                                        lambda x: x.startswith('>')):
+        for is_header, group in groupby(input_handle, lambda x: x.startswith('>')):
             if is_header:
                 chromosome = next(group).strip('>').rstrip('\n')
             else:
