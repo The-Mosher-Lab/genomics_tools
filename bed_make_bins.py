@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 # Author: Jeffrey Grover
-# Purpose: Create bins from a bed file for use in creating metaplots
+# Purpose: Create a new bed file where entries made of bins from the original
+# This is most useful for creating metaplots or looking at expression over a
+# fraction of the original features
 # Created: 1/2018
 
 import csv
