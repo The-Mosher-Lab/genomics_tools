@@ -6,9 +6,15 @@
 # Usage: Load a .methylKit file from MethylDackel and execute methylKit's DMR
 # calling on it to output windows of differential methylation
 
-# Parse command-line arguments
+# Load libraries
+# Because this is adapted from code run in a Jupyter notebook it depends on
+# a subset of the tidyverse. I could remove this dependency in the future.
 
 library('argparser', quietly = TRUE)
+suppressMessages(library('stringr', quietly = TRUE))
+suppressMessages(library('readr', quietly = TRUE))
+
+# Parse command-line arguments
 
 parser <- arg_parser('Analyze input files with methylKit')
 
@@ -48,21 +54,15 @@ parser <- add_argument(parser, '--diff_meth',
                        default=25)
 
 args <- parse_args(parser)
-control_files <- str_split(args$control, ',')
-experimental_files <- str_split(args$experimental, ',')
+control_files <- unlist(str_split(args$control, ','))
+experimental_files <- unlist(str_split(args$experimental, ','))
 
 output_dir <- 'methylkit_analyze'
 dir.create(output_dir)
 
+# Load the methylkit library only after argument parsing because it takes a while to load.
 
-# Load libraries
-# Because this is adapted from code run in a Jupyter notebook it depends on
-# a subset of the tidyverse. I could remove this dependency in the future.
-
-suppressMessages(library('stringr', quietly = TRUE))
-suppressMessages(library('readr', quietly = TRUE))
 suppressMessages(library('methylKit', quietly = TRUE))
-
 
 # This function will analyze methylkit files with the desired parameters
 # It is way too long and does too many things, but it works
@@ -73,10 +73,17 @@ methylkit_analyze <- function(control_files, experimental_files, sample_id_contr
 
   # Read the files
   meth_obj = methRead(
-    c(control_files, experimental_files),
-    sample.id = list(sample_id_control, sample_id_experimental),
+    location = as.list( c(control_files, experimental_files) ),
+    sample.id = as.list(c(
+      rep(sample_id_control, times = length(control_files)),
+      rep(sample_id_experimental, times = length(experimental_files))
+      )
+    ),
     assembly = 'unimportant_unnecessary_option',
-    treatment = c( rep(0, times = length(control_files)), rep(1, times = length(experimental_files)) ),
+    treatment = c(
+      rep(0, times = length(control_files)),
+      rep(1, times = length(experimental_files))
+    ),
     context = c_context
   )
 
