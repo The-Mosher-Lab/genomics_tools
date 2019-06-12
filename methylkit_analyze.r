@@ -13,15 +13,15 @@ library('argparser', quietly = TRUE)
 parser <- arg_parser('Analyze input files with methylKit')
 
 parser <- add_argument(parser, '--control',
-                       help='File path to use for the control sample')
+                       help='File paths to use for the control samples, comma separated')
 parser <- add_argument(parser, '--experimental',
-                       help='File path to use for the experimental sample')
+                       help='File paths to use for the experimental samples, comma separated')
 parser <- add_argument(parser, '--control_id',
                        help='Sample ID for the control sample')
 parser <- add_argument(parser, '--experimental_id',
                        help='Sample ID for the experimental sample')
 parser <- add_argument(parser, '--context',
-                       help='The cytosine context for the comparison to be done',
+                       help='The cytosine context for the experimental to be done',
                        default='CG')
 parser <- add_argument(parser, '--min_cov',
                        help='Minimum number of reads to filter sites by',
@@ -48,6 +48,8 @@ parser <- add_argument(parser, '--diff_meth',
                        default=25)
 
 args <- parse_args(parser)
+control_files <- str_split(args$control, ',')
+experimental_files <- str_split(args$experimental, ',')
 
 output_dir <- 'methylkit_analyze'
 dir.create(output_dir)
@@ -64,17 +66,17 @@ suppressMessages(library('methylKit', quietly = TRUE))
 
 # This function will analyze methylkit files with the desired parameters
 # It is way too long and does too many things, but it works
-methylkit_analyze <- function(control_file, comparison_file, sample_id_control,
-                              sample_id_comparison, c_context, min_coverage,
+methylkit_analyze <- function(control_files, experimental_files, sample_id_control,
+                              sample_id_experimental, c_context, min_coverage,
                               window_size, step_size, cores, q_val, diff,
                               output_dir) {
 
   # Read the files
   meth_obj = methRead(
-    list(control_file, comparison_file),
-    sample.id = list(sample_id_control, sample_id_comparison),
+    c(control_files, experimental_files),
+    sample.id = list(sample_id_control, sample_id_experimental),
     assembly = 'unimportant_unnecessary_option',
-    treatment = c(0, 1),
+    treatment = c( rep(0, times = length(control_files)), rep(1, times = length(experimental_files)) ),
     context = c_context
   )
 
@@ -124,19 +126,19 @@ methylkit_analyze <- function(control_file, comparison_file, sample_id_control,
 
   # Export results
   write_csv(meth_diff_windows,
-            str_c(output_dir, '/', sample_id_comparison, '_', sample_id_control,
+            str_c(output_dir, '/', sample_id_experimental, '_', sample_id_control,
                   '_',c_context, '_norm_window_', window_size, '_', step_size,
                   '_d', diff, '_q', q_val, '.csv'
                   )
             )
   write_csv(meth_diff_hyper,
-            str_c(output_dir, '/', sample_id_comparison, '_', sample_id_control,
+            str_c(output_dir, '/', sample_id_experimental, '_', sample_id_control,
                   '_',c_context, '_norm_window_', window_size, '_', step_size,
                   '_d', diff, '_q', q_val, '_hyper.csv'
                   )
             )
   write_csv(meth_diff_hypo,
-            str_c(output_dir, '/', sample_id_comparison, '_', sample_id_control,
+            str_c(output_dir, '/', sample_id_experimental, '_', sample_id_control,
                   '_',c_context, '_norm_window_', window_size, '_', step_size,
                   '_d', diff, '_q', q_val, '_hypo.csv'
                   )
@@ -146,7 +148,7 @@ methylkit_analyze <- function(control_file, comparison_file, sample_id_control,
 
 # Run the analysis and output results
 
-methylkit_analyze(args$control, args$experimental, args$control_id,
+methylkit_analyze(control_files, experimental_files, args$control_id,
                   args$experimental_id, args$context, args$min_cov,
                   args$window_size, args$step_size, args$threads, args$q_val,
                   args$diff_meth, output_dir)
