@@ -41,6 +41,11 @@ def parse_snps_to_dict(vcf_file):
     return snps_dict
 
 
+def wrap_text(text, width=80):
+    for s in range(0, len(text), width):
+        yield text[s:s+width]
+
+
 def replace_snps(fasta_iterator, snps_dict, output_fasta, genotype):
     with open(output_fasta, 'w') as fasta_writer:
         for chromosome, seq in fasta_iterator:
@@ -53,17 +58,17 @@ def replace_snps(fasta_iterator, snps_dict, output_fasta, genotype):
                         bases[(position - 1)] = snps_dict[chromosome][position][1]
                     else:
                         exit('Error: .vcf reference base and fasta mismatch.')
-            fasta_writer.write(''.join(bases) + '\n')
+            for line in wrap_text(''.join(bases)):
+                fasta_writer.write(line)
 
 
-def main():
+# CLI argument parser
 
-    # Parse command line options
 
+def get_args():
     parser = ArgumentParser(
-        description='Replace SNPs from a .vcf file into the correct positions in a'
-        ' .fasta file. Does not text wrap the output because the python textwrap '
-        'module is veeeery sloooow.')
+        description='Replace SNPs from a .vcf file into the correct positions '
+        'in a .fasta file.')
     parser.add_argument(
         '-f',
         '--fasta',
@@ -81,17 +86,24 @@ def main():
         'file-name indicating the genotype of the SNPs.',
         metavar='STRING')
 
-    fasta_file = parser.parse_args().fasta
-    vcf_file = parser.parse_args().vcf
-    genotype = parser.parse_args().genotype
-    output_fasta = fasta_file.rsplit('.', 1)[0] + '.%s.snps.fa' % genotype
+    return parser.parse_args()
+
+
+# Main function entry point
+
+
+def main(args):
+
+    # Set the output filename
+
+    output_fasta = args.fasta.rsplit('.', 1)[0] + '.%s.snps.fa' % args.genotype
 
     # Process the .fasta and .vcf
 
-    snps_dict = parse_snps_to_dict(vcf_file)
-
-    replace_snps(fasta_iterate(fasta_file), snps_dict, output_fasta, genotype)
+    snps_dict = parse_snps_to_dict(args.vcf)
+    replace_snps(fasta_iterate(args.fasta), snps_dict, output_fasta, args.genotype)
 
 
 if __name__ == "__main__":
-    main()
+    args = get_args()
+    main(args)
