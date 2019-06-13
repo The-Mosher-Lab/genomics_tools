@@ -88,8 +88,7 @@ methylkit_analyze <- function(control_files, experimental_files, sample_id_contr
   )
 
   # Use a read coverage filter
-  meth_obj = filterByCoverage(meth_obj, lo.count = min_coverage
-  )
+  meth_obj = filterByCoverage(meth_obj, lo.count = min_coverage)
 
   # normalizeCoverage for the filtered object
   meth_obj = normalizeCoverage(meth_obj)

@@ -9,17 +9,16 @@ from argparse import ArgumentParser
 from itertools import zip_longest
 from sys import exit
 
-# Functions live here
+# Subroutine functions live here
 
 
 def get_total_fastq_records(input_fastq):
     with open(input_fastq, 'r') as input_handle:
-        return int(sum(1 for line in input_handle if line.strip()) / 4)
-
-
-def validate_fastq(total_fastq_records):
-    if total_fastq_records % 4:
-        exit('Error: Invalid fastq file, lines not divisible by 4.')
+        fastq_lines = sum(1 for line in input_handle if line.strip())
+        if fastq_lines % 4:
+            exit('Error: Invalid fastq file, lines not divisible by 4.')
+        else:
+            return fastq_lines / 4
 
 
 def num_records_from_percent(percent, total_fastq_records):
@@ -58,13 +57,13 @@ def main():
     parser.add_argument('input_fastq',
                         help='Input file to process',
                         metavar='FILE')
-    parser.add_argument('-r', '--reads', help='Reads to sample', type=int)
-    parser.add_argument('-p',
-                        '--percent',
+    parser.add_argument('-r', '--reads',
+                        help='Reads to sample',
+                        type=int)
+    parser.add_argument('-p', '--percent',
                         help='Percent of reads to sample (ex. 10)',
                         type=float)
-    parser.add_argument('-s',
-                        '--seed',
+    parser.add_argument('-s', '--seed',
                         help='Integer to use for a random seed',
                         default=None,
                         type=int)
@@ -78,7 +77,6 @@ def main():
     # Get total fastq records and validate
 
     num_fastq_records = get_total_fastq_records(args.input_fastq)
-    validate_fastq(num_fastq_records)
 
     # Get the random indices
 
