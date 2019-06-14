@@ -129,18 +129,19 @@ def get_args():
         'evenly into your window size or it will likely fail.')
     parser.add_argument('input_bed',
                         help='bed file to process',
-                        metavar='File.bed')
+                        metavar='FILE.bed')
     parser.add_argument('-w', '--window',
                         help='Size of up and downstream windows (nt)',
                         type=int,
-                        metavar='Integer')
+                        metavar='INT')
     parser.add_argument('-b', '--bin_width',
                         help='Bin size (nt)',
                         type=int,
-                        metavar='Integer')
-    parser.add_argument('-o', '--output_prefix',
-                        help='Prefix for output files',
-                        metavar='Prefix[body, up, down]_bin#.bed')
+                        metavar='INT')
+    parser.add_argument('-p', '--prefix',
+                        help='Prefix for output files. Files will be output as:'
+                        'Prefix[body|up|down]_bin#_length[start-stop|percent].bed',
+                        metavar='PREFIX')
     return parser.parse_args()
 
 
