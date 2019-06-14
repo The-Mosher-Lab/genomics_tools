@@ -41,7 +41,9 @@ def create_upstream_bins(bed_dict, window_size, bin_width, output_prefix):
     num_bins = int(window_size / bin_width)
     for i in range(num_bins):
         bin_number = i + 1  # Humans count starting at 1
-        upstream_file = '%su_%s.bed' % (output_prefix, str(bin_number).zfill(2))
+        bin_start = window_size - (bin_width * i)
+        bin_stop = bin_start - (bin_width - 1)
+        upstream_file = '%su_%s_%s-%s.bed' % (output_prefix, str(bin_number).zfill(2), bin_start, bin_stop)
         with open(upstream_file, 'w') as upstream_handle:
             upstream_writer = csv.writer(upstream_handle, delimiter='\t')
             for feature_id in bed_dict:
@@ -63,7 +65,9 @@ def create_downstream_bins(bed_dict, window_size, bin_width, output_prefix):
     num_bins = int(window_size / bin_width)
     for i in range(num_bins):
         bin_number = i + 1
-        downstream_file = '%sd_%s.bed' % (output_prefix, str(bin_number).zfill(2))
+        bin_start = (bin_width * i) + 1
+        bin_stop = (bin_start - 1) + bin_width
+        downstream_file = '%sd_%s_%s-%s.bed' % (output_prefix, str(bin_number).zfill(2), bin_start, bin_stop)
         with open(downstream_file, 'w') as downstream_handle:
             downstream_writer = csv.writer(downstream_handle, delimiter='\t')
             for feature_id in bed_dict:
@@ -85,7 +89,8 @@ def create_body_bins(bed_dict, window_size, bin_width, output_prefix):
     num_bins = int(window_size / bin_width)
     for i in range(num_bins):
         bin_number = i + 1
-        body_file = '%sb_%s.bed' % (output_prefix, str(bin_number).zfill(2))
+        bin_perc_length = bin_number * (100 / num_bins)
+        body_file = '%sb_%s_%s.bed' % (output_prefix, str(bin_number).zfill(2), bin_perc_length)
         with open(body_file, 'w') as body_handle:
             body_writer = csv.writer(body_handle, delimiter='\t')
             for feature_id in bed_dict:
