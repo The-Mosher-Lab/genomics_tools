@@ -5,7 +5,7 @@
 # This is most useful for creating metaplots or looking at expression over a
 # fraction of the original features
 # Created: 2018-01-15
-# Refactored: 2019-06-14
+# Refactored: 2019-06-22
 
 import csv
 from argparse import ArgumentParser
@@ -50,15 +50,25 @@ def create_upstream_bins(bed_dict, window_size, bin_width, output_prefix):
                 chromosome = bed_dict[feature_id]['chromosome']
                 score = bed_dict[feature_id]['score']
                 strand = bed_dict[feature_id]['strand']
-                if bed_dict[feature_id]['strand'] in ('+', '.'):
-                    start = bed_dict[feature_id]['start'] - (window_size - (bin_width * i))
+                start = bed_dict[feature_id]['start']
+                stop = bed_dict[feature_id]['stop']
+
+                # Bins for + and unstranded start at the feature - window size
+
+                if strand in ('+', '.'):
+                    start = start - (window_size - (bin_width * i))
                     stop = start + (bin_width - 1)
-                elif bed_dict[feature_id]['strand'] == '-':
-                    stop = bed_dict[feature_id]['stop'] + (window_size - (bin_width * i))
+
+                # Bins for - strand start at 1 beyond the stop
+
+                elif strand == '-':
+                    stop = stop + (window_size - (bin_width * i))
                     start = stop - (bin_width - 1)
+
+                # Output bins
+
                 output_row = [chromosome, start, stop, feature_id, score, strand]
-                if start >= 0 and stop >= 0:
-                    upstream_writer.writerow(output_row)
+                upstream_writer.writerow(output_row)
 
 
 def create_downstream_bins(bed_dict, window_size, bin_width, output_prefix):
@@ -74,15 +84,25 @@ def create_downstream_bins(bed_dict, window_size, bin_width, output_prefix):
                 chromosome = bed_dict[feature_id]['chromosome']
                 score = bed_dict[feature_id]['score']
                 strand = bed_dict[feature_id]['strand']
-                if bed_dict[feature_id]['strand'] in ('+', '.'):
-                    start = bed_dict[feature_id]['stop'] + ((bin_width * i) + 1)
+                start = bed_dict[feature_id]['start']
+                stop = bed_dict[feature_id]['stop']
+
+                # Bins for + and unstranded start at 1 beyond the feature stop
+
+                if strand in ('+', '.'):
+                    start = stop + ((bin_width * i) + 1)
                     stop = start + (bin_width - 1)
-                elif bed_dict[feature_id]['strand'] == '-':
-                    stop = bed_dict[feature_id]['start'] - ((bin_width * i) + 1)
+
+                # Bins for - strand start 1 before the start
+
+                elif strand == '-':
+                    stop = start - ((bin_width * i) + 1)
                     start = stop - (bin_width - 1)
+
+                # Output bins
+
                 output_row = [chromosome, start, stop, feature_id, score, strand]
-                if start >= 0 and stop >= 0:
-                    downstream_writer.writerow(output_row)
+                downstream_writer.writerow(output_row)
 
 
 def create_body_bins(bed_dict, window_size, bin_width, output_prefix):
@@ -97,26 +117,89 @@ def create_body_bins(bed_dict, window_size, bin_width, output_prefix):
                 chromosome = bed_dict[feature_id]['chromosome']
                 score = bed_dict[feature_id]['score']
                 strand = bed_dict[feature_id]['strand']
-                feature_length = bed_dict[feature_id]['stop'] - bed_dict[feature_id]['start']
+                start = bed_dict[feature_id]['start']
+                stop = bed_dict[feature_id]['stop']
+                feature_length = stop - start
                 body_bin_width = (feature_length / num_bins)
-                if bed_dict[feature_id]['strand'] in ('+', '.'):
-                    start = int(round((bed_dict[feature_id]['start'] + (body_bin_width * i)), 0))
-                    if i < (num_bins - 1):
-                        stop = int(round((start + body_bin_width), 0) - 1)
-                    elif i == (num_bins - 1):
-                        stop = bed_dict[feature_id]['stop']
-                elif bed_dict[feature_id]['strand'] == '-':
+
+                # For + strand or unstranded bin coordinates start at start + 1
+                # First and last will be 1nt shorter to so exact start can be its own bin
+
+                if strand in ('+', '.'):
                     if i == 0:
-                        stop = int(round((bed_dict[feature_id]['stop'] - (body_bin_width * i)), 0))
+                        start = start + 1
                     else:
-                        stop = int(round((bed_dict[feature_id]['stop'] - (body_bin_width * i)), 0) - 1)
-                    if i < (num_bins - 1):
-                        start = int(round((stop - body_bin_width), 0))
-                    elif i == (num_bins - 1):
-                        start = bed_dict[feature_id]['start']
+                        start = int(round((start + (body_bin_width * i)), 0))
+                    stop = int(round((start + body_bin_width), 0) - 1)
+
+                # For - strand bins are numbered from the bed file's "stop"
+                # First will be 1nt shorter to so exact stop can be its own bin
+
+                elif strand == '-':
+                    if i == 0:
+                        stop = int(round((stop - (body_bin_width * i)), 0) - 2)
+                    else:
+                        stop = int(round((stop - (body_bin_width * i)), 0) - 1)
+                    start = int(round((stop - body_bin_width), 0))
+
+                # Output bins
+
                 output_row = [chromosome, start, stop, feature_id, score, strand]
-                if start >= 0 and stop >= 0:
-                    body_writer.writerow(output_row)
+                body_writer.writerow(output_row)
+
+
+def get_start_coords(bed_dict, output_prefix):
+    start_file = '%sstart.bed' % output_prefix
+    with open(start_file, 'w') as start_handle:
+        start_writer = csv.writer(start_handle, delimiter='\t')
+        for feature_id in bed_dict:
+            chromosome = bed_dict[feature_id]['chromosome']
+            score = bed_dict[feature_id]['score']
+            strand = bed_dict[feature_id]['strand']
+            start = bed_dict[feature_id]['start']
+            stop = bed_dict[feature_id]['stop']
+
+            # Start coordinates are zero-based already for + or unstranded
+
+            if strand in ('+', '.'):
+                stop = start + 1
+
+            # For - strand some extra work is required
+
+            elif strand == '-':
+                start = stop - 1
+
+            # Output bins
+
+            output_row = [chromosome, start, stop, feature_id, score, strand]
+            start_writer.writerow(output_row)
+
+
+def get_stop_coords(bed_dict, output_prefix):
+    stop_file = '%sstop.bed' % output_prefix
+    with open(stop_file, 'w') as stop_handle:
+        stop_writer = csv.writer(stop_handle, delimiter='\t')
+        for feature_id in bed_dict:
+            chromosome = bed_dict[feature_id]['chromosome']
+            score = bed_dict[feature_id]['score']
+            strand = bed_dict[feature_id]['strand']
+            start = bed_dict[feature_id]['start']
+            stop = bed_dict[feature_id]['stop']
+
+            # Stop coordinate begins at stop -1 for + or unstranded
+
+            if strand in ('+', '.'):
+                start = stop - 1
+
+            # Already zero baed for - strand
+
+            elif strand == '-':
+                stop = start + 1
+
+            # Output bins
+
+            output_row = [chromosome, start, stop, feature_id, score, strand]
+            stop_writer.writerow(output_row)
 
 
 # Parse command line options
@@ -126,7 +209,8 @@ def get_args():
         description='Create separate bed files for desired bin sizes up and '
         'downstream of an input bed file. Divides feature bodies into an equal '
         'number of bins as well. Be sure to use bin widths that can be divided '
-        'evenly into your window size or it will likely fail.')
+        'evenly into your window size or it will likely fail. Start and stop of'
+        ' each feature is also output as a bin of length 1.')
     parser.add_argument('input_bed',
                         help='bed file to process',
                         metavar='FILE.bed')
@@ -152,6 +236,8 @@ def main(args):
     create_body_bins(bed_dict, args.window, args.bin_width, args.output_prefix)
     create_upstream_bins(bed_dict, args.window, args.bin_width, args.output_prefix)
     create_downstream_bins(bed_dict, args.window, args.bin_width, args.output_prefix)
+    get_start_coords(bed_dict, args.output_prefix)
+    get_stop_coords(bed_dict, args.output_prefix)
 
 
 if __name__ == '__main__':
