@@ -65,10 +65,11 @@ def create_upstream_bins(bed_dict, window_size, bin_width, output_prefix):
                     stop = stop + (window_size - (bin_width * i))
                     start = stop - (bin_width - 1)
 
-                # Output bins
+                # Output bins, but only if the bins are valid coordinates
 
-                output_row = [chromosome, start, stop, feature_id, score, strand]
-                upstream_writer.writerow(output_row)
+                if start >= 0 and stop >= 0:
+                    output_row = [chromosome, start, stop, feature_id, score, strand]
+                    upstream_writer.writerow(output_row)
 
 
 def create_downstream_bins(bed_dict, window_size, bin_width, output_prefix):
@@ -99,10 +100,11 @@ def create_downstream_bins(bed_dict, window_size, bin_width, output_prefix):
                     stop = start - ((bin_width * i) + 1)
                     start = stop - (bin_width - 1)
 
-                # Output bins
+                # Output bins, but only if the bins are valid coordinates
 
-                output_row = [chromosome, start, stop, feature_id, score, strand]
-                downstream_writer.writerow(output_row)
+                if start >= 0 and stop >= 0:
+                    output_row = [chromosome, start, stop, feature_id, score, strand]
+                    downstream_writer.writerow(output_row)
 
 
 def create_body_bins(bed_dict, window_size, bin_width, output_prefix):
@@ -142,10 +144,11 @@ def create_body_bins(bed_dict, window_size, bin_width, output_prefix):
                         stop = int(round((stop - (body_bin_width * i)), 0) - 1)
                     start = int(round((stop - body_bin_width), 0))
 
-                # Output bins
+                # Output bins, but only if the bins are valid coordinates
 
-                output_row = [chromosome, start, stop, feature_id, score, strand]
-                body_writer.writerow(output_row)
+                if start >= 0 and stop >= 0:
+                    output_row = [chromosome, start, stop, feature_id, score, strand]
+                    body_writer.writerow(output_row)
 
 
 def get_start_coords(bed_dict, output_prefix):
@@ -223,8 +226,7 @@ def get_args():
                         type=int,
                         metavar='INT')
     parser.add_argument('-p', '--prefix',
-                        help='Prefix for output files. Files will be output as:'
-                        'Prefix[body|up|down]_bin#_length[start-stop|percent].bed',
+                        help='Prefix for output files. Files will be output as: Prefix[body|up|down]_bin#_length[start-stop|percent].bed',
                         metavar='PREFIX')
     return parser.parse_args()
 
