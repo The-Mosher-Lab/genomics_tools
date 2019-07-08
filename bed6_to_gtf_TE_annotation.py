@@ -18,7 +18,7 @@ def bed_to_gtf(input_file, anno_source):
             entry = line.split()
             chrom = 'Chr_' + entry[0]
             start = int(entry[1]) + 1  # To convert to 1-based coordinates
-            stop = int(entry[2]) + 1
+            stop = int(entry[2])
             name_family = entry[3]
             te_type = entry[
                 4]  # Original .bed file had TE type in this position
@@ -32,21 +32,25 @@ def bed_to_gtf(input_file, anno_source):
 
 # Parse command line options
 
-parser = ArgumentParser(
-    description=
-    'Converts a .bed file with 6 columns to gtf. It requires that you know the '
-    'feature type and source fields and input them using the appropriate '
-    'command line option. This was created to convert a bed file for TE '
-    'annotations, so use for other purposes will require modification.')
-parser.add_argument('input_path', help='File to process', metavar='File')
-parser.add_argument('--source', help='Source of the annotation', type=str)
-parser.add_argument('--feature',
-                    help='The type of feature contained within the .bed file',
-                    type=str)
+def get_args():
+    parser = ArgumentParser(
+        description=
+        'Converts a .bed file with 6 columns to gtf. It requires that you know the '
+        'feature type and source fields and input them using the appropriate '
+        'command line option. This was created to convert a bed file for TE '
+        'annotations, so use for other purposes will require modification.')
+    parser.add_argument('input_path', help='File to process', metavar='File')
+    parser.add_argument('--source', help='Source of the annotation', type=str)
 
-input_path = parser.parse_args().input_path
-source = parser.parse_args().source
+    return parser.parse_args()
+
 
 # Process the file
 
-bed_to_gtf(input_path, source)
+def main(args):
+    bed_to_gtf(args.input_path, args.source)
+
+
+if __name__ == "__main__":
+    args = get_args()
+    main(args)
