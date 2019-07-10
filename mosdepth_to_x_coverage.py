@@ -3,7 +3,7 @@
 # Author: Jeffrey Grover
 # Purpose: Calculate the average coverage over an entire genome from mosdepth
 # per-base coverage output
-# Created: 2/2019
+# Created: 2019-07-10
 
 import gzip
 from argparse import ArgumentParser
@@ -22,14 +22,11 @@ def get_genome_size(fasta_file):
 
 def get_depth(coverage_bedgz):
     bases_sequenced = 0
-    n_lines = 0
     with gzip.open(coverage_bedgz, 'rt') as bed_reader:
         for line in bed_reader:
-            n_lines += 1
             length = int(line.split('\t')[2]) - int(line.split('\t')[1])
             bases_sequenced += int(line.split('\t')[3]) * length
-    average_depth = bases_sequenced / n_lines
-    return (bases_sequenced, average_depth)
+    return bases_sequenced
 
 
 def get_x_coverage(bases_sequenced, genome_size):
@@ -41,15 +38,14 @@ def get_x_coverage(bases_sequenced, genome_size):
 def get_args():
     parser = ArgumentParser(
         description='Calculate X coverage from mosdepth .bed.gz output. Works '
-        'over window-based output or per-base output. If windows are used the '
-        'coverage value is based on the mean over each window.')
+        'over window-based output or per-base output.')
     parser.add_argument(
         '-f', '--fasta',
         help='.fasta file for genome',
         metavar='File')
     parser.add_argument(
         '-m', '--mosdepth',
-        help='.bed.gz mosdepth per-base',
+        help='.bed.gz mosdepth output',
         metavar='File')
     return parser.parse_args()
 
@@ -59,13 +55,12 @@ def get_args():
 def main(args):
     genome_size = get_genome_size(args.fasta)
     depth = get_depth(args.mosdepth)
-    x_coverage = get_x_coverage(depth[0], genome_size)
+    x_coverage = get_x_coverage(depth, genome_size)
 
     # Output to stdout
 
     print('Genome Size:', genome_size)
-    print('Total Depth:', depth[0])
-    print('Average Depth:', depth[1])
+    print('Total Depth:', depth)
     print('X Coverage:', x_coverage)
 
 
