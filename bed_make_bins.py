@@ -10,8 +10,8 @@
 import csv
 from argparse import ArgumentParser
 
-# Subroutine functions
 
+# Subroutine functions
 
 def parse_bed_to_dict(input_bed):
     bed_dict = {}
