@@ -41,12 +41,12 @@ def calc_methylation(input_file, mincov):
             entry = line.strip().split()
             nC = int(entry[4])
             nT = int(entry[5])
-            try:
-                if (nC + nT) >= mincov:
+            if (nC + nT) >= mincov:
+                try:
                     perc_met = nC / (nC + nT) * 100
-            except ZeroDivisionError:
-                perc_met = 0
-            print('\t'.join(entry[0:4]), perc_met, sep='\t')
+                except ZeroDivisionError:
+                    perc_met = 0
+                print('\t'.join(entry[0:4]), perc_met, sep='\t')
 
 
 # Get command line options
