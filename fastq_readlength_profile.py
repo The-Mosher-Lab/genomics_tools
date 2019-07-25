@@ -5,23 +5,32 @@
 # Created: 02/2019
 
 from argparse import ArgumentParser
+import gzip
 
-# Define a function to iterate through the .fastq and profile the reads
+
+# Functions
+
+def opener(input_file, gzipped):
+    if gzipped:
+        return gzip.open(input_file, 'rt')
+    else:
+        return open(input_file, 'r')
 
 
-def fastq_length_profile(input_fastq):
+def fastq_length_profile(input_fastq, gzipped):
     fastq_lengths_dict = {}
-    with open(input_fastq) as input_handle:
-        n = 0
-        for line in input_handle:
-            n += 1
-            seq_length = len(line.strip())
-            if n == 2 and seq_length not in fastq_lengths_dict:
-                fastq_lengths_dict[seq_length] = 1
-            elif n == 2 and seq_length in fastq_lengths_dict:
-                fastq_lengths_dict[seq_length] += 1
-            elif n == 4:
-                n = 0
+    if gzipped:
+        with opener(input_fastq, gzipped) as input_handle:
+            n = 0
+            for line in input_handle:
+                n += 1
+                seq_length = len(line.strip())
+                if n == 2 and seq_length not in fastq_lengths_dict:
+                    fastq_lengths_dict[seq_length] = 1
+                elif n == 2 and seq_length in fastq_lengths_dict:
+                    fastq_lengths_dict[seq_length] += 1
+                elif n == 4:
+                    n = 0
     return fastq_lengths_dict
 
 
@@ -33,12 +42,25 @@ def output_fastq_lengths(input_fastq_lengths_dict):
 
 # Parse command line options
 
-parser = ArgumentParser(
-    description='Counts the different lengths of reads in a .fastq file.')
-parser.add_argument('fastq', help='Input .fastq', metavar='File')
 
-input_fastq = parser.parse_args().fastq
+def get_args():
+    parser = ArgumentParser(
+        description='Counts the different lengths of reads in a .fastq file.')
+    parser.add_argument('fastq',
+                        help='Input .fastq',
+                        metavar='FILE')
+    parser.add_argument('-z', '--gzip',
+                        help='Input file is .gz compressed',
+                        action='store_true')
+    return parser.parse_args()
+
 
 # Parse and count
 
-output_fastq_lengths(fastq_length_profile(input_fastq))
+
+def main(args):
+    output_fastq_lengths(fastq_length_profile(args.fastq, args.gzip))
+
+
+if __name__ == '__main__':
+    main(get_args())
