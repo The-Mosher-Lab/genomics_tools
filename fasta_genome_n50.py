@@ -31,21 +31,21 @@ def calc_n50(chrom_lengths):
             return chrom_length
 
 
-# Define a main function
+# Parse command line arguments
 
-
-def main():
-
-    # Parse command line arguments
-
+def get_args():
     parser = ArgumentParser(
         description='Calculate the n50 from a provided genome')
     parser.add_argument('input_fasta',
                         help='Input file to process',
                         metavar='.fasta')
-    genome_fasta = parser.parse_args().input_fasta
+    return parser.parse_args()
 
-    n50 = calc_n50(get_chrom_lengths(genome_fasta))
+
+# Define a main function
+
+def main(args):
+    n50 = calc_n50(get_chrom_lengths(args.genome_fasta))
     print('N50: %s kb' % (n50 / 1000))
 
 

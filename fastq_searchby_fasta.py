@@ -11,12 +11,17 @@ import gzip
 from argparse import ArgumentParser
 from collections import OrderedDict
 
-# Functions block
+
+def magic_open(input_file):
+    if input_file.endswith('gz'):
+        return gzip.open(input_file, 'rt')
+    else:
+        return open(input_file, 'r')
 
 
 def load_fasta(input_fasta):
     fasta_dict = OrderedDict()
-    with gzip.open(input_fasta, 'rt') as input_handle:
+    with magic_open(input_fasta) as input_handle:
         for line in input_handle:
             if line.startswith('>'):
                 seq_ID = line[1:].split(' ')[0]
@@ -26,7 +31,7 @@ def load_fasta(input_fasta):
 
 
 def search_fastq(input_fastq, search_dict):
-    with gzip.open(input_fastq, 'rt') as input_handle:
+    with magic_open(input_fastq) as input_handle:
         n = 0
         for line in input_handle:
             n += 1
@@ -48,24 +53,27 @@ def output_counts(input_dict, lib_name):
 
 # Parse command line options
 
-parser = ArgumentParser(
-    description='Reads a list of sequences in .fasta format and counts '
-    'occurances of that sequence in a .fastq file.')
-parser.add_argument('--fa',
-                    help='Input .fasta',
-                    metavar='File')
-parser.add_argument('--fq',
-                    help='Input .fastq',
-                    metavar='File')
-parser.add_argument('-n',
-                    '--name',
-                    help='Library ID or name',
-                    metavar='String')
+def get_args():
+    parser = ArgumentParser(
+        description='Reads a list of sequences in .fasta format and counts '
+        'occurances of that sequence in a .fastq file.')
+    parser.add_argument('-a', '--fasta',
+                        help='Input .fasta, may be gzipped',
+                        metavar='FILE.fasta(.gz)')
+    parser.add_argument('-q', '--fastq',
+                        help='Input .fastq, may be gzipped',
+                        metavar='FILE.fastq(.gz)')
+    parser.add_argument('-n', '--name',
+                        help='Library ID or name',
+                        metavar='String')
+    return parser.parse_args()
 
-input_fasta = parser.parse_args().fa
-input_fastq = parser.parse_args().fq
-lib_name = parser.parse_args().name
 
 # Parse and count
 
-output_counts(search_fastq(input_fastq, load_fasta(input_fasta)), lib_name)
+def main(args):
+    output_counts(search_fastq(args.fastq, load_fasta(args.fasta)), args.name)
+
+
+if __name__ == '__main__':
+    main(get_args())

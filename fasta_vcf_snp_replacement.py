@@ -13,13 +13,17 @@ from sys import exit
 
 
 def fasta_iterate(fasta_file):
-    with open(fasta_file, 'r') as reader:
-        fasta_reader = (
-            x[1] for x in groupby(reader, lambda line: line.startswith('>')))
+    with open(fasta_file, 'r') as input_handle:
+        fasta_reader = (x[1] for x in groupby(input_handle, lambda line: line.startswith('>')))
         for header in fasta_reader:
             chromosome = next(header).strip('>').rstrip('\n')
             seq = ''.join(s.strip() for s in next(fasta_reader))
             yield (chromosome, seq)
+
+
+def wrap_text(text, width=80):
+    for s in range(0, len(text), width):
+        yield text[s:s+width]
 
 
 def parse_snps_to_dict(vcf_file):
@@ -41,29 +45,22 @@ def parse_snps_to_dict(vcf_file):
     return snps_dict
 
 
-def wrap_text(text, width=80):
-    for s in range(0, len(text), width):
-        yield text[s:s+width]
-
-
-def replace_snps(fasta_iterator, snps_dict, output_fasta, genotype):
-    with open(output_fasta, 'w') as fasta_writer:
-        for chromosome, seq in fasta_iterator:
-            fasta_header = '>%s_%s' % (chromosome, genotype)
-            bases = list(seq)
-            fasta_writer.write(fasta_header + '\n')
-            if chromosome in snps_dict:
-                for position in snps_dict[chromosome]:
-                    if snps_dict[chromosome][position][0] == bases[(position - 1)]:  # Due to 1-based coordinate system
-                        bases[(position - 1)] = snps_dict[chromosome][position][1]
-                    else:
-                        exit('Error: .vcf reference base and fasta mismatch.')
-            for line in wrap_text(''.join(bases)):
-                fasta_writer.write(line)
+def replace_snps(fasta_iterator, snps_dict, genotype):
+    for chromosome, seq in fasta_iterator:
+        fasta_header = '>%s_%s' % (chromosome, genotype)
+        bases = list(seq)
+        print(fasta_header)
+        if chromosome in snps_dict:
+            for position in snps_dict[chromosome]:
+                if snps_dict[chromosome][position][0] == bases[(position - 1)]:  # Due to 1-based coordinate system
+                    bases[(position - 1)] = snps_dict[chromosome][position][1]
+                else:
+                    exit('Error: .vcf reference base and fasta mismatch.')
+        for line in wrap_text(''.join(bases)):
+            print(line)
 
 
 # CLI argument parser
-
 
 def get_args():
     parser = ArgumentParser(
@@ -73,7 +70,7 @@ def get_args():
         '-f',
         '--fasta',
         help='An input fasta file to use as a reference',
-        metavar='FILE')
+        metavar='FILE.fasta')
     parser.add_argument(
         '-v',
         '--vcf',
@@ -85,25 +82,15 @@ def get_args():
         help='A string which will be added to the chromosome IDs and output '
         'file-name indicating the genotype of the SNPs.',
         metavar='STRING')
-
     return parser.parse_args()
 
 
 # Main function entry point
 
-
 def main(args):
-
-    # Set the output filename
-
-    output_fasta = args.fasta.rsplit('.', 1)[0] + '.%s.snps.fa' % args.genotype
-
-    # Process the .fasta and .vcf
-
     snps_dict = parse_snps_to_dict(args.vcf)
-    replace_snps(fasta_iterate(args.fasta), snps_dict, output_fasta, args.genotype)
+    replace_snps(fasta_iterate(args.fasta), snps_dict, args.genotype)
 
 
 if __name__ == "__main__":
-    args = get_args()
-    main(args)
+    main(get_args())
