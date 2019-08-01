@@ -57,7 +57,7 @@ def get_args():
         'from an input .bed file of regions and the per-base methylation calls '
         'output by MethylDackel.')
     parser.add_argument('-b', '--bed',
-                        help='bed file to process with two score columns',
+                        help='bed file to process, three columns only',
                         metavar='FILE.bed')
     parser.add_argument('-g', '--bedGraph',
                         help='bedGraph file of methylation calls',
@@ -99,7 +99,7 @@ def main(args):
     calc_methylation(sum_filename, args.mincov)
 
     print('Cleaning up temporary files...', file=stderr)
-    if not args.keep_sorted:
+    if not args.keep_sorted and not args.sorted:
         remove(sorted_features_bed)
         remove(sorted_bedGraph)
     remove(sum_filename)
