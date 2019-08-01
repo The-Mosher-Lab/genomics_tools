@@ -5,35 +5,47 @@
 # Created: 12/2016
 
 import re
+import gzip
 from argparse import ArgumentParser
 
 
-# Define function to iterate over fastq reads and output reads to new file in fasta format
+def magic_open(input_file):
+    if input_file.endswith('gz'):
+        return gzip.open(input_file, 'rt')
+    else:
+        return open(input_file, 'r')
 
 
-def fq_to_fa(input_path, output_path):
+def fq_to_fa(input_fastq, output_path):
     n = 0
     fq_record = []
-    with open(input_path, 'r') as input_file:
-        with open(output_path, 'w') as output_file:
-            for line in input_file:
-                n += 1
-                fq_record.append(line)
-                if n == 4:
-                    output_file.write(re.sub(r'^@', '>', fq_record[0]))
-                    output_file.write(fq_record[1])
-                    n = 0
-                    fq_record = []
+    with magic_open(input_fastq) as input_handle:
+        for line in input_handle:
+            n += 1
+            fq_record.append(line.strip())
+            if n == 4:
+                fq_record[0] = re.sub(r'^@', '>', fq_record[0])
+                print('\n'.join(fq_record[0, 1]))
+                n = 0
+                fq_record = []
 
 
 # Parse command line options
 
-parser = ArgumentParser(description='Converts an input fastq file to fasta')
-parser.add_argument('input_path', help='Input .fastq file', metavar='File')
+def get_args():
+    parser = ArgumentParser(
+        description='Converts an input fastq file to fasta')
+    parser.add_argument('fastq',
+                        help='Input .fastq file, may be gzipped',
+                        metavar='FILE.fastq(.gz)')
+    return parser.parse_args()
 
-input_fastq = parser.parse_args().input_path
-output_fasta = re.sub(r'\.fastq$', '.fasta', input_fastq)
 
 # Convert the .fastq
 
-fq_to_fa(input_fastq, output_fasta)
+def main(args):
+    fq_to_fa(args.fastq)
+
+
+if __name__ == '__main__':
+    main(get_args())

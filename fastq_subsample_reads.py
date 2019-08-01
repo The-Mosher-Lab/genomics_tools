@@ -5,15 +5,21 @@
 # Created: 2019-06-06
 
 import random
+import gzip
 from argparse import ArgumentParser
 from itertools import zip_longest
 from sys import exit
 
-# Subroutine functions live here
+
+def magic_open(input_file):
+    if input_file.endswith('gz'):
+        return gzip.open(input_file, 'rt')
+    else:
+        return open(input_file, 'r')
 
 
 def get_total_fastq_records(input_fastq):
-    with open(input_fastq, 'r') as input_handle:
+    with magic_open(input_fastq) as input_handle:
         fastq_lines = sum(1 for line in input_handle if line.strip())
         if fastq_lines % 4:
             exit('Error: Invalid fastq file, lines not divisible by 4.')
@@ -30,7 +36,7 @@ def get_random_record_indices(num_to_sample, total_fastq_records):
 
 
 def read_fastq(input_fastq):
-    with open(input_fastq, 'r') as input_handle:
+    with magic_open(input_fastq) as input_handle:
         fastq_iterator = (l.strip() for l in input_handle)
         for fastq_record in zip_longest(*[fastq_iterator] * 4):
             yield list(fastq_record)
@@ -44,13 +50,9 @@ def sample_fastq(fastq_reader, random_indices):
             print('\n'.join(fastq_record))
 
 
-# Define a main function
+# Commandline parser
 
-
-def main():
-
-    # Parse command line arguments
-
+def get_args():
     parser = ArgumentParser(
         description='Randomly subsample a fastq file by either percent or total'
         ' number of reads')
@@ -67,8 +69,12 @@ def main():
                         help='Integer to use for a random seed',
                         default=None,
                         type=int)
-    args = parser.parse_args()
+    return parser.parse_args()
 
+
+# Define a main function
+
+def main(args):
     if not args.reads and not args.percent:
         exit('Error: You must supply a number of reads or percent to sample')
     elif args.reads and args.percent:
@@ -94,4 +100,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(get_args())
