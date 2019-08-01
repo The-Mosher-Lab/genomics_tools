@@ -155,15 +155,9 @@ get_args <- function () {
 
 # Main definition
 
-main <- function () {
-
-  # Get args
-
-  args <- get_args()
+main <- function (args) {
   control_files <- unlist(strsplit(args$control, ','))
   experimental_files <- unlist(strsplit(args$experimental, ','))
-
-  # Create out_dir
 
   output_dir <- 'methylkit_analyze'
   dir.create(output_dir)
@@ -179,4 +173,4 @@ main <- function () {
 
 # Call main
 
-main()
+main(get_args())

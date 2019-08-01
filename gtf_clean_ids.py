@@ -9,38 +9,45 @@
 from argparse import ArgumentParser
 
 
-def clean_gtf(input_file, cleaner_sep):
+def clean_gtf(input_file, cleaner_sep, chromosome, feature):
     with open(input_file, 'r') as input_handle:
         for line in input_handle:
-            entry = line.split('\t')
-            chrom = entry[0].split(cleaner_sep)[0]
-            source = entry[1]
-            feature = entry[2]
-            start = entry[3]
-            stop = entry[4]
-            score = entry[5]
-            strand = entry[6]
-            frame = entry[7]
+            entry = line.strip().split('\t')
+            if chromosome:
+                entry[0] = entry[0].split(cleaner_sep)[0]
             group = entry[8].split('; ')
-            transcript_id = group[0].split(cleaner_sep)[0]
-            gene_id = group[1].split(cleaner_sep)[0]
-            gene_name = group[2].split(cleaner_sep)[0]
-            print(chrom, source, feature, start, stop, score, strand, frame,
-                  sep='\t', end='\t')
-            print(transcript_id, gene_id, gene_name, sep='"; ', end='"\n')
+            if feature:
+                transcript_id = group[0].split(cleaner_sep)[0]
+                gene_id = group[1].split(cleaner_sep)[0]
+                gene_name = group[2].split(cleaner_sep)[0]
+                group = [transcript_id, gene_id, gene_name]
+            print('\t'.join(entry[0:8]), end='\t')
+            print('"; '.join(group), end='"\n')
 
 
 # Parse command line options
 
-parser = ArgumentParser(
-    description='Removes garbage from chromosome and gene IDs in a '
-    'gtf file. Works on at least the one file I needed it to')
-parser.add_argument('input_path', help='File to process', metavar='File')
-parser.add_argument('--sep', '-s', help='Separator to remove text after')
 
-input_path = parser.parse_args().input_path
-cleaner_sep = parser.parse_args().sep
+def get_args():
+    parser = ArgumentParser(
+        description='Removes garbage from chromosome and gene IDs in a gtf.')
+    parser.add_argument('gtf', help='File to process', metavar='FILE.gtf')
+    parser.add_argument('--sep', '-s', help='Separator to remove text after')
+    parser.add_argument('--chromosome', '-c',
+                        help='Clean chromosome IDs',
+                        action='store_true')
+    parser.add_argument('--feature', '-f',
+                        help='Clean feature IDs',
+                        action='store_true')
+    return parser.parse_args()
+
 
 # Process file
 
-clean_gtf(input_path, cleaner_sep)
+
+def main(args):
+    clean_gtf(args.gtf, args.sep, args.chromosome, args.feature)
+
+
+if __name__ == '__main__':
+    main(get_args())

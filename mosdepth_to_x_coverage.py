@@ -42,11 +42,11 @@ def get_args():
     parser.add_argument(
         '-f', '--fasta',
         help='.fasta file for genome',
-        metavar='File')
+        metavar='FILE.fasta')
     parser.add_argument(
         '-m', '--mosdepth',
         help='.bed.gz mosdepth output',
-        metavar='File')
+        metavar='FILE.bed.gz')
     return parser.parse_args()
 
 
@@ -65,5 +65,4 @@ def main(args):
 
 
 if __name__ == '__main__':
-    args = get_args()
-    main(args)
+    main(get_args())

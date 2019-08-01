@@ -47,4 +47,4 @@ def main(args):
 
 
 if __name__ == '__main__':
-    gff_to_bed(get_args())
+    main(get_args())
