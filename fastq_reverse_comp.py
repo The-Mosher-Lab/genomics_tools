@@ -9,8 +9,6 @@ from argparse import ArgumentParser
 import gzip
 
 
-# Functions
-
 def magic_opener(input_file):
     if input_file.endswith('gz'):
         return gzip.open(input_file, 'rt')
@@ -48,7 +46,7 @@ def get_args():
         description='Returns the reverse complement of a fastq file to stdout.')
     parser.add_argument('fastq',
                         help='Input .fastq, may be gzipped',
-                        metavar='FILE')
+                        metavar='FILE.fastq(.gz)')
     return parser.parse_args()
 
 

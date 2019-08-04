@@ -54,8 +54,9 @@ def calc_methylation(input_file, mincov):
 def get_args():
     parser = ArgumentParser(
         description='Calculate percent methylation over features of interest '
-        'from an input .bed file of regions and the per-base methylation calls '
-        'output by MethylDackel.')
+        'from an input .bed file of regions and the per-base or region '
+        'methylation calls from a .bedGraph file (from MethylDackel for '
+        'example).')
     parser.add_argument('-b', '--bed',
                         help='bed file to process, three columns only',
                         metavar='FILE.bed')

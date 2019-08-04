@@ -8,19 +8,17 @@ from argparse import ArgumentParser
 import gzip
 
 
-# Functions
-
-def opener(input_file, gzipped):
-    if gzipped:
+def magic_open(input_file):
+    if input_file.endswith('gz'):
         return gzip.open(input_file, 'rt')
     else:
         return open(input_file, 'r')
 
 
-def fastq_length_profile(input_fastq, gzipped):
+def fastq_length_profile(input_fastq):
     fastq_lengths_dict = {}
     if gzipped:
-        with opener(input_fastq, gzipped) as input_handle:
+        with magic_open(input_fastq) as input_handle:
             n = 0
             for line in input_handle:
                 n += 1
@@ -47,11 +45,8 @@ def get_args():
     parser = ArgumentParser(
         description='Counts the different lengths of reads in a .fastq file.')
     parser.add_argument('fastq',
-                        help='Input .fastq',
+                        help='Input .fastq(.gz)',
                         metavar='FILE')
-    parser.add_argument('-z', '--gzip',
-                        help='Input file is .gz compressed',
-                        action='store_true')
     return parser.parse_args()
 
 
