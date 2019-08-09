@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 
 # Author: Jeffrey Grover
-# Purpose: Profile nucleotide bias by position from reads in a .fastq file
+# Purpose: Profile nucleotide bias at ends of reads from a .fastq file
 # Created: 2019-08-09
-
-# Warning: this script requires sorted dictionary behavior and will likely not
-# work with Python < 3.7
 
 import gzip
 from argparse import ArgumentParser
@@ -29,30 +26,32 @@ def fastq_yield_seqs(input_fastq):
                 i = 0
 
 
-def profile_reads(fastq_seqs, length):
-    position_freq_dict = {}
-    for i in range(length):
-        position = i + 1
-        position_freq_dict.update({position: {'A': 0, 'T': 0, 'C': 0, 'G': 0}})
+def end_bias(fastq_seqs, min_length, max_length):
+    bias_dict = {'5_prime': {'A': 0, 'T': 0, 'C': 0, 'G': 0},
+                 '3_prime': {'A': 0, 'T': 0, 'C': 0, 'G': 0}}
     for sequence in fastq_seqs:
-        position = 0
-        if len(sequence) == length:
-            for base in sequence:
-                position += 1
-                position_freq_dict[position][base] += 1
-    return position_freq_dict
+        if min_length <= len(sequence) <= max_length:
+            bias_dict['5_prime'][sequence[0]] += 1
+            bias_dict['3_prime'][sequence[-1]] += 1
+    return bias_dict
 
 
 # Command line parser
 
 def get_args():
     parser = ArgumentParser(
-        description='Profile nucleotide content by position from a .fastq file')
+        description='Profile 3\' and 5\' nucleotide bias from .fastq file')
     parser.add_argument('fastq',
                         help='Input .fastq, may be gzipped',
                         metavar='FILE.fastq(.gz)')
-    parser.add_argument('-l', '--length',
-                        help='Length of reads to profile',
+    parser.add_argument('-n', '--min_length',
+                        help='Minimum length of reads to profile',
+                        default=0,
+                        type=int,
+                        metavar='INT')
+    parser.add_argument('-m', '--max_length',
+                        help='Maximum length of reads to profile',
+                        default=150,
                         type=int,
                         metavar='INT')
     return parser.parse_args()
@@ -61,10 +60,12 @@ def get_args():
 # Main function entry point
 
 def main(args):
-    read_profile = profile_reads(fastq_yield_seqs(args.fastq), args.length)
-    print('position', 'A', 'T', 'C', 'G', sep=',')
-    for position, freq_dict in read_profile.items():
-        line = [str(position)]
+    bias_dict = end_bias(
+        fastq_yield_seqs(args.fastq), args.min_length, args.max_length
+    )
+    print('end', 'A', 'T', 'C', 'G', sep=',')
+    for end, freq_dict in bias_dict.items():
+        line = [end]
         for base, count in freq_dict.items():
             line.append(str(count))
         print(','.join(line))
