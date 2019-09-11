@@ -25,7 +25,7 @@ def fq_to_fa(input_fastq, output_path):
             fq_record.append(line.strip())
             if n == 4:
                 fq_record[0] = re.sub(r'^@', '>', fq_record[0])
-                print('\n'.join(fq_record[0, 1]))
+                print('\n'.join(fq_record[0:2]))
                 n = 0
                 fq_record = []
 
