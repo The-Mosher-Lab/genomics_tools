@@ -45,9 +45,11 @@ def get_args():
 # Define a main function
 
 def main(args):
-    n50 = calc_n50(get_chrom_lengths(args.genome_fasta))
+    chrom_lengths = get_chrom_lengths(args.input_fasta)
+    n50 = calc_n50(chrom_lengths)
     print('N50: %s kb' % (n50 / 1000))
+    print('Size: %s' % (sum(chrom_lengths)))
 
 
 if __name__ == "__main__":
-    main()
+    main(get_args())
